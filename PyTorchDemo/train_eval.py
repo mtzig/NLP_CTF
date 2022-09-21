@@ -23,11 +23,8 @@ def train(dataloader, model, loss_fn, optimizer, verbose=False, use_tqdm=False):
     for _ in step_iter:
 
         X, y = next(dataloader)
-        pred = model(X)
 
-        print('pred', sum(pred.argmax(1) == y).item(), sum(y).item())
-
-        loss = loss_fn(pred, y)
+        loss = loss_fn(model(X), y)
         avg_loss += loss.item()
 
         # Backpropagation
