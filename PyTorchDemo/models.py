@@ -7,7 +7,7 @@ class BertClassifier(nn.Module):
     '''
 
     def __init__(self, num_labels=2, device='cpu'):
-        super(BertClassifier, self).__init__()
+        super().__init__()
         self.bert = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased', num_labels=num_labels).to(device)
         self.device = device
 
