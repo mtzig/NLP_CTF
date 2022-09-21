@@ -5,17 +5,15 @@ from torch.utils.data import Dataset
 
 
 class SimpleDataset(Dataset):
-    """
+    '''
     A simple dataset
-    """
+    '''
 
     def __init__(self, features, labels):
         '''
-        INPUTS:
-        args: of the form X, y, c
-              where X is the model inputs
-              y is the labels
-              and c is the subclass labels
+        Inputs:
+        features: a tensor of the features of the dataset
+        labels: a tensor of same shape, of the corresponding labels
         '''
         self.features = features
         self.labels = labels
