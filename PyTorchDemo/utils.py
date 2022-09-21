@@ -35,11 +35,11 @@ def load_jigsaw(file_path='../data/jigsaw', device='cpu', demo_mode=False):
         df_test = df_test.sample(frac=1).reset_index()
 
 
-        df_train = pd.concat((df_train[df_train['toxic'] == 1].iloc[:5000],
-                            df_train[df_train['toxic'] == 0].iloc[:5000]))
+        df_train = pd.concat((df_train[df_train['toxic'] == 1].iloc[:128],
+                            df_train[df_train['toxic'] == 0].iloc[:128]))
 
-        df_test = pd.concat((df_test[df_test['toxic'] == 1].iloc[:500],
-                            df_test[df_test['toxic'] == 0].iloc[:500]))
+        df_test = pd.concat((df_test[df_test['toxic'] == 1].iloc[:128],
+                            df_test[df_test['toxic'] == 0].iloc[:128]))
 
 
 
