@@ -130,3 +130,5 @@ dmypy.json
 
 # large datasets
 all_data_with_identities.csv
+
+.DS_Store
