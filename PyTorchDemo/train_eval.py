@@ -23,7 +23,11 @@ def train(dataloader, model, loss_fn, optimizer, verbose=False, use_tqdm=False):
     for _ in step_iter:
 
         X, y = next(dataloader)
-        loss = loss_fn(model(X), y)
+        pred = model(X)
+
+        print('pred', sum(pred.argmax(1) == y).item(), sum(y).item())
+
+        loss = loss_fn(pred, y)
         avg_loss += loss.item()
 
         # Backpropagation
@@ -77,8 +81,10 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
 
             pred = model(X)
             
-            pred = pred.to('cpu')
-            y = y.to('cpu')
+            # PyTorch does not support tensor indexing on metal, so need to move to cpu
+            if pred.device == 'mps':
+                pred = pred.to('cpu')
+                y = y.to('cpu')
 
             positive_count += (y==1.0).sum().item()
 
