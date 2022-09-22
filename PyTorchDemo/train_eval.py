@@ -79,7 +79,7 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
             pred = model(X)
             
             # PyTorch does not support tensor indexing on metal, so need to move to cpu
-            if pred.device == 'mps':
+            if pred.device.type == 'mps':
                 pred = pred.to('cpu')
                 y = y.to('cpu')
 
