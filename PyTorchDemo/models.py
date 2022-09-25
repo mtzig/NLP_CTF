@@ -17,3 +17,16 @@ class BertClassifier(nn.Module):
         mask = X[:,1]
         return self.bert(input_ids= input_id, attention_mask=mask)[0]
 
+
+
+class CNNClassifier(nn.Module):
+
+    def __init__(self, device='cpu') -> None:
+        super().__init__()
+        self.featurizer = nn.Conv1d(_, 5, device=device)
+        self.classifier = 
+
+
+    def forward(self, X):
+        '''
+        '''

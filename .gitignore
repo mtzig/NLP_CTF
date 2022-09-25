@@ -131,4 +131,6 @@ dmypy.json
 # large datasets
 all_data_with_identities.csv
 
-.DS_Store
+**/.DS_Store
+
+/data/GoogleNews-vectors-negative300.bin
