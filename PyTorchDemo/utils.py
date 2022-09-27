@@ -42,7 +42,6 @@ def load_jigsaw(file_path='../data/jigsaw', device='cpu', demo_mode=False):
                             df_test[df_test['toxic'] == 0].iloc[:128]))
 
 
-
     tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased', use_fast=True)
 
     datasets = []
