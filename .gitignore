@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# large files
+data/train_df_synthetic.csv
+
 # C extensions
 *.so
 
