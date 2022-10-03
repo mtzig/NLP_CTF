@@ -8,7 +8,7 @@ from datasets import SimpleDataset
 
 
 
-def get_jigsaw_datasets(file_path='./data/jigsaw', device='cpu', demo_mode=False):
+def get_jigsaw_datasets(file_path='./data/jigsaw', device='cpu'):
 
     
     # Create df with train data
@@ -23,22 +23,7 @@ def get_jigsaw_datasets(file_path='./data/jigsaw', device='cpu', demo_mode=False
 
     # ints = []
     embed_lookup = init_embed_lookup()
-    
-    if demo_mode:
-        np.random.seed(3)
-        df_train = df_train.sample(frac=1).reset_index(drop=True)
-        df_test = df_test.sample(frac=1).reset_index(drop=True)
-
-        df_train = pd.concat((df_train[df_train['toxic'] == 1].iloc[:128],
-                            df_train[df_train['toxic'] == 0].iloc[:128]))
-
-        df_test = pd.concat((df_test[df_test['toxic'] == 1].iloc[:128],
-                            df_test[df_test['toxic'] == 0].iloc[:128]))
-
-
-        df_train.reset_index(drop=True, inplace=True)
-        df_test.reset_index(drop=True, inplace=True)
-
+     
     datasets = []
 
     for df in (df_train, df_test):
