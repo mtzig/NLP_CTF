@@ -8,15 +8,21 @@ from datasets import SimpleDataset
 
 
 
-def get_jigsaw_datasets(file_path='./data/jigsaw', device='cpu'):
+def get_jigsaw_datasets(file_path='./data', device='cpu', data_set = 'None'):
 
     
     # Create df with train data
-    df_train = pd.read_csv(f'{file_path}/train.csv')
+    df_train = pd.read_csv(f'{file_path}/jigsaw/train.csv')
     # Create df with test data
-    df_test = pd.read_csv(f'{file_path}/test.csv')
+    df_test = pd.read_csv(f'{file_path}/jigsaw/test.csv')
 
-    df_test_labels = pd.read_csv(f'{file_path}/test_labels.csv')
+
+    if data_set == 'blind':
+        df_train = pd.read_csv(f'{file_path}/train_df_blind.csv')
+    elif data_set == 'augment':
+        df_train = pd.read_csv(f'{file_path}/train_df_synthetic.csv')
+
+    df_test_labels = pd.read_csv(f'{file_path}/jigsaw/test_labels.csv')
     df_test['toxic'] = df_test_labels['toxic']
     df_test = df_test[df_test['toxic'] != -1]
     df_test.reset_index(inplace=True)
