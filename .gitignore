@@ -5,6 +5,7 @@ __pycache__/
 
 # large files
 data/train_df_synthetic.csv
+data/civil_comments.csv
 
 # C extensions
 *.so
