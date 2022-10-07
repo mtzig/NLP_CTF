@@ -2,7 +2,7 @@
 from tqdm import tqdm
 import torch
 
-def train(dataloader, model, loss_fn, optimizer, verbose=False, use_tqdm=False):
+def train(dataloader, model, loss_fn, optimizer, verbose=False):
     '''
     Train the model for one epoch
     dataloader: The dataloader for the training data
@@ -14,15 +14,14 @@ def train(dataloader, model, loss_fn, optimizer, verbose=False, use_tqdm=False):
     '''
     model.train()
 
-    steps_per_epoch = dataloader.batches_per_epoch()
+    data_iter = iter(dataloader)
 
     avg_loss = 0
 
-    step_iter = tqdm(range(steps_per_epoch)) if use_tqdm else range(steps_per_epoch)
+    num_batches = len(dataloader)
 
-    for _ in step_iter:
+    for _, (X, y) in enumerate(tqdm(data_iter)):
 
-        X, y = next(dataloader)
 
         loss = loss_fn(model(X), y)
         avg_loss += loss.item()
@@ -35,7 +34,7 @@ def train(dataloader, model, loss_fn, optimizer, verbose=False, use_tqdm=False):
         optimizer.step()
 
 
-    avg_loss /= steps_per_epoch
+    avg_loss /= num_batches
 
     if verbose:
         print("Average training loss:", avg_loss)
@@ -57,24 +56,26 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
     '''
 
     model.eval()
+    data_iter = iter(dataloader)
 
-    # num_samples = np.zeros(num_subclasses)
-    # subgroup_correct = np.zeros(num_subclasses)
+    sensitivity = 0
+    specificity = 0
+    accuracy = 0
+
+    positive_count = 0
+
+    num_batches = len(dataloader)
+
+
     with torch.no_grad():
-        steps_per_epoch = dataloader.batches_per_epoch()
-        sensitivity = 0
-        specificity = 0
-        accuracy = 0
-
-        positive_count = 0
+        
 
         if get_loss:
             loss = 0
             loss_fn = torch.nn.CrossEntropyLoss()
 
-        for i in tqdm(range(steps_per_epoch)):
+        for _, (X,y) in enumerate(tqdm(data_iter)):
            
-            X, y = next(dataloader)
 
             pred = model(X)
             
@@ -94,7 +95,7 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
                 loss += loss_fn(pred, y)
 
         if get_loss:
-            loss /= steps_per_epoch
+            loss /= num_batches
 
         sensitivity /= positive_count
         specificity /= (len(dataloader.dataset) - positive_count)
@@ -109,3 +110,29 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
         return loss, accuracy, sensitivity, specificity
 
     return accuracy, sensitivity, specificity
+
+def CTF(dataloader, model):
+    
+    model.eval()
+
+    data_iter = iter(dataloader)
+    
+    cum_gap = 0
+    num_examples = 0
+
+    with torch.no_grad():
+
+        for _, (X,A) in enumerate(data_iter):
+
+            # this is redundant to do every iteration, but whatever
+            l, i ,w = A.shape
+            
+            A_preds = torch.nn.functional.softmax(model(A.reshape(-1, w)), 1).reshape(l, i, -1)[:,:,0]
+            X_preds = torch.unsqueeze(torch.nn.functional.softmax(model(X), 1)[:,0], 1)
+
+            cum_gap += torch.sum(torch.abs(X_preds - A_preds))
+
+            num_examples += l * i
+
+    return cum_gap / num_examples
+#
