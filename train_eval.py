@@ -20,7 +20,7 @@ def train(dataloader, model, loss_fn, optimizer, verbose=False):
 
     num_batches = len(dataloader)
 
-    for _, (X, y) in enumerate(tqdm(data_iter)):
+    for (X, y) in tqdm(data_iter):
 
 
         loss = loss_fn(model(X), y)
@@ -74,7 +74,7 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
             loss = 0
             loss_fn = torch.nn.CrossEntropyLoss()
 
-        for _, (X,y) in enumerate(tqdm(data_iter)):
+        for (X,y) in tqdm(data_iter):
            
 
             pred = model(X)
@@ -122,7 +122,7 @@ def CTF(dataloader, model):
 
     with torch.no_grad():
 
-        for _, (X,A) in enumerate(data_iter):
+        for (X,A) in tqdm(data_iter):
 
             # this is redundant to do every iteration, but whatever
             l, i ,w = A.shape
