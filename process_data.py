@@ -123,8 +123,8 @@ def process_blind(df):
         if df.at[row_index, "identity"] == 1:
             for identity in idents:
                 if df.at[row_index, identity] == 1 :
-                    #TODO: Handle cases such as 'transparent'
-                    df.at[row_index, "comment_text"] = df.at[row_index, "comment_text"].replace(identity, token)
+                    regex = r'\b' + re.escape(identity) + r'\b'
+                    df.at[row_index, "comment_text"] = re.sub(regex, token, df.at[row_index, "comment_text"], flags=re.IGNORECASE)
     return df
 
 
