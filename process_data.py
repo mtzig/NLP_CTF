@@ -1,20 +1,20 @@
+from operator import index
 import pandas as pd
 import numpy as np
 import torch
 from gensim.models import KeyedVectors
 from gensim.utils import tokenize
 from datasets import SimpleDataset
-import tqdm
+from tqdm import tqdm
 
 
+def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', embed_lookup=None):
 
+    if not embed_lookup:
+        embed_lookup = init_embed_lookup()
 
-def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline'):
-
-    
     # Create df with train data
     df_train = pd.read_csv(f'{file_path}/jigsaw/train_with_idents.csv')
-
 
     if data_type == 'blind':
         df_train = process_blind(df_train)
@@ -31,14 +31,13 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline'):
     df_dev.reset_index(inplace=True)
 
 
-    embed_lookup = init_embed_lookup()
      
     datasets = []
 
     for df in (df_train, df_dev):
 
         padded_id = []
-        for comment in df['comment_text']:
+        for comment in tqdm(df['comment_text']):
             seq = tokenize(comment)
             id = get_id(seq, embed_lookup)
             padded_id.append(pad_seq(id))
@@ -52,7 +51,49 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline'):
 
     return datasets
 
+def get_eval_datasets(file_path='./data', dataset='civil_test', device='cpu', embed_lookup=None):
+    
+    if not embed_lookup:
+        embed_lookup = init_embed_lookup()
 
+    if dataset == 'civil_test':
+        df = pd.read_csv(f'{file_path}/civil_test_data.csv', index_col=0)
+
+
+    X_comments = []
+    A_comments = []
+
+    # assume every column except comment_text is for an identity
+    num_idents = len(df.columns) - 1
+    num_sents = len(df)
+
+
+    for row in df.itertuples():
+
+        # first tokenize/ get ID of comment
+        comment = row[1]
+        seq = tokenize(comment)
+        id = get_id(seq, embed_lookup)
+        X_comments.append(pad_seq(id))
+
+        # next do the same with adversarially perturbed sentences
+        perturbed_sentences = row[2:]
+        for perturbed in perturbed_sentences:
+            seq = tokenize(perturbed)
+            id = get_id(seq, embed_lookup)
+            A_comments.append(pad_seq(id))
+            
+
+
+
+
+    X = torch.tensor(X_comments, device=device)
+    A = torch.tensor(A_comments, device=device).reshape(num_sents, num_idents, -1)
+    
+    dataset = SimpleDataset(X, A)
+
+    return dataset
+        
 
 def process_blind(df):
     '''
@@ -73,12 +114,12 @@ def process_blind(df):
         # Adding identity column to train_df_short (either works I think)
     df['identity'] = (df[idents].sum(axis=1) > 0).astype(int)
     
-
         # Creating train_df_blind by dropping all identiy columns from train_df_short
 
     # Replacing identities in comment text with an identity token
     token = "identity"
     for row_index in tqdm(range(len(df))):
+
         if df.at[row_index, "identity"] == 1:
             for identity in idents:
                 if df.at[row_index, identity] == 1 :
@@ -120,19 +161,18 @@ def process_augment(df):
                     comment_list.append(df_identities.at[row_index, "comment_text"].replace(identity, diff_identity))
                     toxic_list.append(df_identities.at[row_index, "toxic"])
                     augmented.append(1)
-                    
+     
     data_tuples = list(zip(comment_list, toxic_list))
     train_df_augment = pd.DataFrame(data_tuples, columns=['comment_text','toxic'])
 
-    df_nonidents = df[df.identity==0].reset_index()['comment_text', 'toxic']
+    df_nonidents = df[df.identity==0][['comment_text', 'toxic']].reset_index()
     # train_df_augment['augmented'] = augmented
-    return df.concat((train_df_augment, df_nonidents), ignore_index=True)
+    return pd.concat((train_df_augment, df_nonidents), ignore_index=True)
+
 
 
 def init_embed_lookup(file_path='./data/GoogleNews-vectors-negative300.bin'):
     return KeyedVectors.load_word2vec_format(file_path, binary=True)
-
-
 
 def get_id(seq, embed_lookup):
 
