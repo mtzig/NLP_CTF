@@ -9,12 +9,11 @@ from tqdm import tqdm
 
 idents = ['gay', 'bisexual', 'transgender', 'trans',
        'queer', 'lgbt', 'lgbtq', 'homosexual', 'straight', 'heterosexual',
-       'male', 'female', 'nonbinary', 'african', 'african american', 'black',
-       'white', 'european', 'hispanic', 'latino', 'latina', 'latinx',
-       'mexican', 'canadian', 'american', 'asian', 'indian', 'middle eastern',
-       'chinese', 'japanese', 'christian', 'muslim', 'jewish', 'buddhist',
-       'catholic', 'protestant', 'sikh', 'taoist', 'old', 'older', 'young',
-       'younger', 'teenage', 'millenial', 'middle aged', 'elderly', 'blind',
+       'male', 'female', 'nonbinary', 'african', 'black',
+       'white', 'european', 'hispanic', 'latino',
+       'buddhist', 'catholic', 'protestant', 'sikh', 'taoist', 
+       'old', 'older', 'young',
+       'younger', 'teenage', 'millenial', 'elderly', 'blind',
        'deaf', 'paralyzed', 'lesbian']
 
 def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', embed_lookup=None):
