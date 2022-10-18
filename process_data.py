@@ -7,6 +7,15 @@ from gensim.utils import tokenize
 from datasets import SimpleDataset
 from tqdm import tqdm
 
+idents = ['gay', 'bisexual', 'transgender', 'trans',
+       'queer', 'lgbt', 'lgbtq', 'homosexual', 'straight', 'heterosexual',
+       'male', 'female', 'nonbinary', 'african', 'african american', 'black',
+       'white', 'european', 'hispanic', 'latino', 'latina', 'latinx',
+       'mexican', 'canadian', 'american', 'asian', 'indian', 'middle eastern',
+       'chinese', 'japanese', 'christian', 'muslim', 'jewish', 'buddhist',
+       'catholic', 'protestant', 'sikh', 'taoist', 'old', 'older', 'young',
+       'younger', 'teenage', 'millenial', 'middle aged', 'elderly', 'blind',
+       'deaf', 'paralyzed', 'lesbian']
 
 def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', embed_lookup=None):
 
@@ -101,15 +110,7 @@ def process_blind(df):
     '''
 
 
-    idents = ['gay', 'bisexual', 'transgender', 'trans',
-       'queer', 'lgbt', 'lgbtq', 'homosexual', 'straight', 'heterosexual',
-       'male', 'female', 'nonbinary', 'african', 'african american', 'black',
-       'white', 'european', 'hispanic', 'latino', 'latina', 'latinx',
-       'mexican', 'canadian', 'american', 'asian', 'indian', 'middle eastern',
-       'chinese', 'japanese', 'christian', 'muslim', 'jewish', 'buddhist',
-       'catholic', 'protestant', 'sikh', 'taoist', 'old', 'older', 'young',
-       'younger', 'teenage', 'millenial', 'middle aged', 'elderly', 'blind',
-       'deaf', 'paralyzed', 'lesbian']
+    
 
         # Adding identity column to train_df_short (either works I think)
     df['identity'] = (df[idents].sum(axis=1) > 0).astype(int)
@@ -129,16 +130,6 @@ def process_blind(df):
 
 
 def process_augment(df):
-
-    idents = ['gay', 'bisexual', 'transgender', 'trans',
-       'queer', 'lgbt', 'lgbtq', 'homosexual', 'straight', 'heterosexual',
-       'male', 'female', 'nonbinary', 'african', 'african american', 'black',
-       'white', 'european', 'hispanic', 'latino', 'latina', 'latinx',
-       'mexican', 'canadian', 'american', 'asian', 'indian', 'middle eastern',
-       'chinese', 'japanese', 'christian', 'muslim', 'jewish', 'buddhist',
-       'catholic', 'protestant', 'sikh', 'taoist', 'old', 'older', 'young',
-       'younger', 'teenage', 'millenial', 'middle aged', 'elderly', 'blind',
-       'deaf', 'paralyzed', 'lesbian']
 
     # Adding identity column to train_df_short (either works I think)
     df['identity'] = (df[idents].sum(axis=1) > 0).astype(int)
