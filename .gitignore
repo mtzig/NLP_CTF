@@ -7,6 +7,9 @@ __pycache__/
 data/train_df_synthetic.csv
 data/civil_comments.csv
 data/all_data_with_identities.csv
+data/all_data.csv
+data/synthetic_non_toxic_df.csv
+data/synthetic_toxic_df.csv
 
 # C extensions
 *.so
