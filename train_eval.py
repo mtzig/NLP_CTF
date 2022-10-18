@@ -135,4 +135,21 @@ def CTF(dataloader, model):
             num_examples += l * i
 
     return cum_gap / num_examples
-#
+
+def CLP_Loss(X, A, model):
+    '''
+    X: l x ...
+    A: l x ...
+    '''
+
+    model.eval()
+
+    A_out = model(A)
+    X_out = model(X)
+
+    loss = torch.sum(torch.abs(X_out - A_out))
+
+    model.train()
+
+
+    return loss
