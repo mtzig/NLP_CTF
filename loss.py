@@ -35,7 +35,7 @@ class CLP_loss:
 
             # print(self.A[M[ident_comments]].gather(1, sampler).shape)
 
-            loss += self.lmbda * self.CLP(X[ident_comments], self.A[M[ident_comments]].gather(1, sampler).squeeze(1), model)
+            loss += self.lmbda * self.CLP(X[ident_comments], self.A[M[ident_comments]].gather(1, sampler).squeeze(1), model) / num_ident_comments
 
         return loss
 
