@@ -81,7 +81,7 @@ def get_eval_datasets(file_path='./data', dataset='civil_test', device='cpu', em
 
     if dataset == 'civil_test':
         # df = pd.read_csv(f'{file_path}/civil_test_data.csv', index_col=0)
-        df = pd.read_csv(f'{file_path}/synthetic_toxic_DF.csv', index_col=0)
+        df = pd.read_csv(f'{file_path}/', index_col=0)
 
 
 

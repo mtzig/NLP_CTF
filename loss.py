@@ -2,11 +2,13 @@ import torch
 
 class CLP_loss:
 
-    def __init__(self, loss_fn, A):
+    def __init__(self, loss_fn, A, lmbda=0.05):
 
         self.loss_fn = loss_fn
 
         self.A = A
+
+        self.lmbda = lmbda
 
         # number of identity terms per comment is the 2nd dim of A
         self.num_idents = A.shape[1]
@@ -33,7 +35,7 @@ class CLP_loss:
 
             # print(self.A[M[ident_comments]].gather(1, sampler).shape)
 
-            loss += self.CLP(X[ident_comments], self.A[M[ident_comments]].gather(1, sampler).squeeze(1), model)
+            loss += self.lmbda * self.CLP(X[ident_comments], self.A[M[ident_comments]].gather(1, sampler).squeeze(1), model)
 
         return loss
 
