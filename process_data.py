@@ -1,10 +1,9 @@
-from operator import index
 import pandas as pd
 import numpy as np
 import torch
 from gensim.models import KeyedVectors
 from gensim.utils import tokenize
-from datasets import SimpleDataset
+from torch.utils.data import TensorDataset
 from tqdm import tqdm
 
 idents = ['gay', 'bisexual', 'transgender', 'trans',
@@ -17,7 +16,12 @@ idents = ['gay', 'bisexual', 'transgender', 'trans',
        'deaf', 'paralyzed', 'lesbian']
 
 def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', embed_lookup=None):
+    '''
+    return datasets of the form X,y,M where M is metadata
 
+    M is only meaningful when data_type is baseline
+    
+    '''
     if not embed_lookup:
         embed_lookup = init_embed_lookup()
 
@@ -29,35 +33,46 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
     elif data_type == 'augment':
         df_train = process_augment(df_train)
 
-    
-    # Create df with dev data
-    df_dev = pd.read_csv(f'{file_path}/jigsaw/test.csv')
-        
-    df_dev_labels = pd.read_csv(f'{file_path}/jigsaw/test_labels.csv')
-    df_dev['toxic'] = df_dev_labels['toxic']
-    df_dev = df_dev[df_dev['toxic'] != -1]
-    df_dev.reset_index(inplace=True)
+   
 
-
+    if data_type == 'CLP':
+        M = torch.tensor(df_train['index'])
+    else:
+        M = torch.zeros(len(df_train)) #only need metadata for CLP
      
     datasets = []
 
-    for df in (df_train, df_dev):
 
-        padded_id = []
-        for comment in tqdm(df['comment_text']):
-            seq = tokenize(comment)
-            id = get_id(seq, embed_lookup)
-            padded_id.append(pad_seq(id))
 
-        X = torch.tensor(padded_id, device=device)
-        y = torch.tensor(df['toxic'], device=device)
+    padded_id = []
+    for comment in tqdm(df_train['comment_text']):
+        seq = tokenize(comment)
+        id = get_id(seq, embed_lookup)
+        padded_id.append(pad_seq(id))
 
-        dataset = SimpleDataset(X, y)
+    X = torch.tensor(padded_id, device=device)
+    y = torch.tensor(df_train['toxic'], device=device)
 
-        datasets.append(dataset)
+    dataset = TensorDataset(X, y, M)
 
-    return datasets
+    # need to get the adversarial matrix
+    if data_type == 'CLP':
+        df_adversarial = pd.read_csv(f'{file_path}/jigsaw/train_adversarials.csv')
+        
+        tokenized_adversarials = []
+        for row in tqdm(df_adversarial.itertuples(), total=len(df_adversarial)):
+            row_adv = []
+            for comment in row[3:]:
+                seq = tokenize(comment)
+                id = get_id(seq, embed_lookup)
+                row_adv.append(pad_seq(id))
+            tokenized_adversarials.append(row_adv)
+
+        A = torch.tensor(tokenized_adversarials, device=device)
+
+        return dataset, A
+
+    return dataset
 
 def get_eval_datasets(file_path='./data', dataset='civil_test', device='cpu', embed_lookup=None):
     
@@ -65,7 +80,9 @@ def get_eval_datasets(file_path='./data', dataset='civil_test', device='cpu', em
         embed_lookup = init_embed_lookup()
 
     if dataset == 'civil_test':
-        df = pd.read_csv(f'{file_path}/civil_test_data.csv', index_col=0)
+        # df = pd.read_csv(f'{file_path}/civil_test_data.csv', index_col=0)
+        df = pd.read_csv(f'{file_path}/synthetic_toxic_DF.csv', index_col=0)
+
 
 
     X_comments = []
@@ -76,7 +93,7 @@ def get_eval_datasets(file_path='./data', dataset='civil_test', device='cpu', em
     num_sents = len(df)
 
 
-    for row in df.itertuples():
+    for row in tqdm(df.itertuples(), total=len(df)):
 
         # first tokenize/ get ID of comment
         comment = row[1]
@@ -98,7 +115,7 @@ def get_eval_datasets(file_path='./data', dataset='civil_test', device='cpu', em
     X = torch.tensor(X_comments, device=device)
     A = torch.tensor(A_comments, device=device).reshape(num_sents, num_idents, -1)
     
-    dataset = SimpleDataset(X, A)
+    dataset = TensorDataset(X, A)
 
     return dataset
         

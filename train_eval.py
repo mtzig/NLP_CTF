@@ -20,10 +20,10 @@ def train(dataloader, model, loss_fn, optimizer, verbose=False):
 
     num_batches = len(dataloader)
 
-    for (X, y) in tqdm(data_iter):
+    for minibatch in tqdm(data_iter):
 
 
-        loss = loss_fn(model(X), y)
+        loss = loss_fn(model, minibatch)
         avg_loss += loss.item()
 
         # Backpropagation
@@ -136,20 +136,4 @@ def CTF(dataloader, model):
 
     return cum_gap / num_examples
 
-def CLP_Loss(X, A, model):
-    '''
-    X: l x ...
-    A: l x ...
-    '''
 
-    model.eval()
-
-    A_out = model(A)
-    X_out = model(X)
-
-    loss = torch.sum(torch.abs(X_out - A_out))
-
-    model.train()
-
-
-    return loss

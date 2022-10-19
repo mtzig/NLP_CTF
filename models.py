@@ -40,9 +40,6 @@ class CNNClassifier(nn.Module):
 
         embed_dim = pretrained_embed.shape[1]
 
-        # self.embedder = nn.Embedding(num_embed, embed_dim, device=device)
-        # self.embedder.requires_grad = False
-        # self.embedder = nn.Embedding.from_pretrained(torch.from_numpy(KeyedVector.vectors).to(device))
         self.embedder = nn.Embedding.from_pretrained(pretrained_embed.to(device))
 
 
