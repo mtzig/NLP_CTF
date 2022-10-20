@@ -73,7 +73,7 @@ def get_jigsaw_dev_data(file_path='./data', device='cpu', embed_lookup=None):
         padded_id.append(pad_seq(id))
 
     X = torch.tensor(padded_id, device=device)
-    y = torch.tensor(df['toxic'], device=device)
+    y = torch.tensor(df_dev['toxic'], device=device)
 
     return TensorDataset(X, y)
 
