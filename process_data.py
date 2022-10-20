@@ -15,6 +15,46 @@ idents = ['gay', 'bisexual', 'transgender', 'trans',
        'younger', 'teenage', 'millenial', 'elderly', 'blind',
        'deaf', 'paralyzed', 'lesbian']
 
+
+
+
+def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
+    '''
+    gets the test split of civil comments dataset
+    '''
+
+    if not embed_lookup:
+        embed_lookup = init_embed_lookup()
+
+    url_CivilComments = 'https://worksheets.codalab.org/rest/bundles/0x8cd3de0634154aeaad2ee6eb96723c6e/contents/blob/all_data_with_identities.csv'
+    print('b')
+    CC_df = pd.read_csv(url_CivilComments, index_col=0)
+    print('h')
+    CC_df['toxicity'] = (CC_df['toxicity'] >= 0.5).astype(int)
+
+
+    sub_df = CC_df[CC_df['split'] == 'test']
+
+
+    padded_id = []
+    for comment in tqdm(sub_df['comment_text'].values):
+        seq = tokenize(comment)
+        id = get_id(seq, embed_lookup)
+        padded_id.append(pad_seq(id))
+
+
+    
+    features = torch.tensor(padded_id, device=device)
+
+
+       
+    labels = torch.from_numpy(sub_df['toxicity'].values).to(device)
+    labels = labels.to(device).long()
+    
+    return TensorDataset(features, labels)
+
+
+
 def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', embed_lookup=None):
     '''
     return datasets of the form X,y,M where M is metadata
