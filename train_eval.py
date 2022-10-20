@@ -85,7 +85,7 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
             pred = model(X)
 
             true_y.append(y)
-            pred_y.append(pred)
+            pred_y.append(pred[:,1]) #only care about toxic pred
             
             # PyTorch does not support tensor indexing on metal, so need to move to cpu
             if pred.device.type == 'mps':
