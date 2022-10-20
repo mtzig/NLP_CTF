@@ -27,9 +27,7 @@ def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
         embed_lookup = init_embed_lookup()
 
     url_CivilComments = 'https://worksheets.codalab.org/rest/bundles/0x8cd3de0634154aeaad2ee6eb96723c6e/contents/blob/all_data_with_identities.csv'
-    print('b')
-    CC_df = pd.read_csv(url_CivilComments, index_col=0)
-    print('h')
+    CC_df = pd.read_csv(url_CivilComments, index_col=0, engine='python')
     CC_df['toxicity'] = (CC_df['toxicity'] >= 0.5).astype(int)
 
 
@@ -54,6 +52,30 @@ def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
     return TensorDataset(features, labels)
 
 
+
+def get_jigsaw_dev_data(file_path='./data', device='cpu', embed_lookup=None):
+
+    if not embed_lookup:
+        embed_lookup = init_embed_lookup()
+    
+    # Create df with dev data
+    df_dev = pd.read_csv(f'{file_path}/jigsaw/test.csv')
+        
+    df_dev_labels = pd.read_csv(f'{file_path}/jigsaw/test_labels.csv')
+    df_dev['toxic'] = df_dev_labels['toxic']
+    df_dev = df_dev[df_dev['toxic'] != -1]
+    df_dev.reset_index(inplace=True)
+
+    padded_id = []
+    for comment in tqdm(df_dev['comment_text']):
+        seq = tokenize(comment)
+        id = get_id(seq, embed_lookup)
+        padded_id.append(pad_seq(id))
+
+    X = torch.tensor(padded_id, device=device)
+    y = torch.tensor(df['toxic'], device=device)
+
+    return TensorDataset(X, y)
 
 def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', embed_lookup=None):
     '''
@@ -115,6 +137,9 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
     return dataset
 
 def get_eval_datasets(file_path='./data', dataset='civil_test', device='cpu', embed_lookup=None):
+    '''
+        returns datasets to be used for CTF metric
+    '''
     
     if not embed_lookup:
         embed_lookup = init_embed_lookup()

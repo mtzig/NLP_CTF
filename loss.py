@@ -70,5 +70,5 @@ class ERM_loss:
 
     def __call__(self, model, minibatch):
 
-        X, y, _ = minibatch
+        X, y = minibatch[:2]
         return self.loss_fn(model(X), y)

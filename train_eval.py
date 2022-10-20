@@ -1,6 +1,7 @@
 
 from tqdm import tqdm
 import torch
+from sklearn.metrics import roc_auc_score
 
 def train(dataloader, model, loss_fn, optimizer, verbose=False):
     '''
@@ -41,7 +42,7 @@ def train(dataloader, model, loss_fn, optimizer, verbose=False):
 
 def evaluate(dataloader, model, get_loss=False, verbose=False):
     '''
-    Evaluate the model's accuracy, sensitivities and specificity (assumes binary classification)
+    Evaluate the model's accuracy, sensitivities and specificity (assumes binary classification), auc
 
     Input:
     dataloader: The dataloader for the validation/testing data
@@ -67,6 +68,9 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
     num_batches = len(dataloader)
 
 
+    true_y = []
+    pred_y = []
+
     with torch.no_grad():
         
 
@@ -74,10 +78,14 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
             loss = 0
             loss_fn = torch.nn.CrossEntropyLoss()
 
-        for (X,y) in tqdm(data_iter):
+        for minibatch in tqdm(data_iter):
            
+            X, y = minibatch[:2]
 
             pred = model(X)
+
+            true_y.append(y)
+            pred_y.append(pred)
             
             # PyTorch does not support tensor indexing on metal, so need to move to cpu
             if pred.device.type == 'mps':
@@ -101,15 +109,21 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
         specificity /= (len(dataloader.dataset) - positive_count)
         accuracy /= len(dataloader.dataset)
 
+        true_y = torch.cat(true_y).cpu().numpy()
+        pred_y = torch.cat(pred_y).cpu().numpy()
+
+        auc = roc_auc_score(true_y, pred_y)
+
+
     if verbose:
         if get_loss:
             print(f'Loss: {loss}')
-        print(f'Accuracy: {accuracy}, Sensitivity: {sensitivity}, Specificity: {specificity}')
+        print(f'Accuracy: {accuracy}, Sensitivity: {sensitivity}, Specificity: {specificity}, AUC: {auc}')
 
     if get_loss:
-        return loss, accuracy, sensitivity, specificity
+        return loss, accuracy, sensitivity, specificity, auc
 
-    return accuracy, sensitivity, specificity
+    return accuracy, sensitivity, specificity, auc
 
 def CTF(dataloader, model):
     
