@@ -24,8 +24,7 @@ def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
     if not embed_lookup:
         embed_lookup = init_embed_lookup()
 
-    url_CivilComments = 'https://worksheets.codalab.org/rest/bundles/0x8cd3de0634154aeaad2ee6eb96723c6e/contents/blob/all_data_with_identities.csv'
-    CC_df = pd.read_csv(url_CivilComments, index_col=0, engine='python')
+    CC_df = pd.read_csv('./data/civil_comments/civil_comments.csv', index_col=0)
     CC_df['toxicity'] = (CC_df['toxicity'] >= 0.5).astype(int)
 
 
@@ -136,7 +135,7 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
 
     return dataset
 
-def get_ctf_datasets(file_path='./data', dataset='civil_test', device='cpu', embed_lookup=None):
+def get_ctf_datasets(file_path='./data', dataset='civil_eval', device='cpu', embed_lookup=None):
     '''
         returns datasets to be used for CTF metric
 
@@ -149,8 +148,17 @@ def get_ctf_datasets(file_path='./data', dataset='civil_test', device='cpu', emb
     if not embed_lookup:
         embed_lookup = init_embed_lookup()
 
-    if dataset == 'civil_test':
+    if dataset == 'civil_eval':
         df = pd.read_csv(f'{file_path}/civil_comments/civil_test_data.csv', index_col=0)
+    elif dataset == 'civil_train':
+        df = pd.read_csv(f'{file_path}/civil_comments/civil_train_data.csv', index_col=0)
+
+    # TODO: implement this synthetic -- do the processing on the fly using synthetic
+    elif dataset == 'synth_nontoxic':
+        return
+    else:
+        return
+
 
 
     X_comments = []
