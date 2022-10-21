@@ -1,5 +1,6 @@
 import argparse
 import torch
+import gc
 from process_data import get_jigsaw_datasets, init_embed_lookup, get_ctf_datasets, get_CivilComments_Datasets, get_jigsaw_dev_data
 from models import CNNClassifier
 from train_eval import train, evaluate, CTF
@@ -49,7 +50,13 @@ ctf_loader = torch.utils.data.DataLoader(ctf_data, batch_size=64)
 for trial in range(int(args.trials)):
     print(f'Trial {trial+1}/{int(args.trials)}')
 
-    # initialize models
+    # first we do garbage collection,
+    # as torch sometimes does not free model when we reinitialize it
+    model = None
+    gc.collect()
+    torch.cuda.empty_cache()
+
+    # initialize models    
     model = CNNClassifier(pretrained_embed,device=DEVICE)
     if args.train_method == 'CLP':
         loss_fn = CLP_loss(torch.nn.CrossEntropyLoss(), A)
