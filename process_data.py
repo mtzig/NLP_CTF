@@ -16,8 +16,6 @@ idents = ['gay', 'bisexual', 'transgender', 'trans',
        'deaf', 'paralyzed', 'lesbian']
 
 
-
-
 def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
     '''
     gets the test split of civil comments dataset
@@ -39,13 +37,9 @@ def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
         seq = tokenize(comment)
         id = get_id(seq, embed_lookup)
         padded_id.append(pad_seq(id))
-
-
     
     features = torch.tensor(padded_id, device=device)
 
-
-       
     labels = torch.from_numpy(sub_df['toxicity'].values).to(device)
     labels = labels.to(device).long()
     
@@ -109,10 +103,6 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
         M = torch.tensor(df_train['index'])
     else:
         M = torch.zeros(len(df_train)) 
-     
-    datasets = []
-
-
 
     padded_id = []
     for comment in tqdm(df_train['comment_text']):
@@ -163,7 +153,6 @@ def get_eval_datasets(file_path='./data', dataset='civil_test', device='cpu', em
         df = pd.read_csv(f'{file_path}/civil_comments/civil_test_data.csv', index_col=0)
 
 
-
     X_comments = []
     A_comments = []
 
@@ -188,9 +177,6 @@ def get_eval_datasets(file_path='./data', dataset='civil_test', device='cpu', em
             A_comments.append(pad_seq(id))
             
 
-
-
-
     X = torch.tensor(X_comments, device=device)
     A = torch.tensor(A_comments, device=device).reshape(num_sents, num_idents, -1)
     
@@ -204,13 +190,8 @@ def process_blind(df):
     Preprocess dataframe to have identity tokens masked as identity
     '''
 
-
-    
-
-        # Adding identity column to train_df_short (either works I think)
+    # Adding identity column to train_df_short (either works I think)
     df['identity'] = (df[idents].sum(axis=1) > 0).astype(int)
-    
-        # Creating train_df_blind by dropping all identiy columns from train_df_short
 
     # Replacing identities in comment text with an identity token
     token = "identity"
@@ -228,7 +209,6 @@ def process_augment(df):
 
     # Adding identity column to train_df_short (either works I think)
     df['identity'] = (df[idents].sum(axis=1) > 0).astype(int)
-
 
     df_identities = df[df.identity==1].reset_index()
     comment_list = []
