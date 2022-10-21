@@ -136,7 +136,7 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
 
     return dataset
 
-def get_eval_datasets(file_path='./data', dataset='civil_test', device='cpu', embed_lookup=None):
+def get_ctf_datasets(file_path='./data', dataset='civil_test', device='cpu', embed_lookup=None):
     '''
         returns datasets to be used for CTF metric
 
