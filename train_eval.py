@@ -154,6 +154,6 @@ def CTF(dataloader, model):
 
             num_examples += l * i
 
-    return cum_gap / num_examples
+    return (cum_gap / num_examples).item()
 
 
