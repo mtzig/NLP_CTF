@@ -42,17 +42,17 @@ def train(dataloader, model, loss_fn, optimizer, verbose=False):
 
 def evaluate(dataloader, model, get_loss=False, verbose=False):
     '''
-    Evaluate the model's accuracy, sensitivities and specificity (assumes binary classification), auc
+    Evaluate the model's accuracy, sensitivities and specificity (assumes binary classification), AUC
 
     Input:
     dataloader: The dataloader for the validation/testing data
     model: The model to evaluate
 
-    get_loss: Calculate the average cross-entropy loss as well as the accuracy and subclass sensitivities
+    get_loss: Calculates the average cross-entropy loss
     verbose: Whether to print the results
 
     Output:
-    A tuple containing the overall accuracy and the sensitivity/specificity
+    A tuple containing the overall accuracy and the sensitivity/specificity, AUC
 
     '''
 
@@ -126,6 +126,12 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
     return accuracy, sensitivity, specificity, auc
 
 def CTF(dataloader, model):
+    '''
+        Calculates the CTF gap
+
+        model: the model to evaluate CTF on
+        dataloader: the data to evaluate CTF on
+    '''
     
     model.eval()
 

@@ -54,6 +54,9 @@ def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
 
 
 def get_jigsaw_dev_data(file_path='./data', device='cpu', embed_lookup=None):
+    '''
+    returns the dev split of jigsaw dataset
+    '''
 
     if not embed_lookup:
         embed_lookup = init_embed_lookup()
@@ -82,6 +85,11 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
     return datasets of the form X,y,M where M is metadata
 
     M is only meaningful when data_type is baseline
+
+    baseline: returns baseline data
+    blind: returns data with blind preprocessing
+    augment: retuns data with augment preprocessing
+    CLP: returns A, a tensor of adversarially perturbed examples
     
     '''
     if not embed_lookup:
@@ -96,11 +104,11 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
         df_train = process_augment(df_train)
 
    
-
+    #only need metadata for CLP, otherwise we just use some dummy data
     if data_type == 'CLP':
         M = torch.tensor(df_train['index'])
     else:
-        M = torch.zeros(len(df_train)) #only need metadata for CLP
+        M = torch.zeros(len(df_train)) 
      
     datasets = []
 
@@ -122,6 +130,8 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
         df_adversarial = pd.read_csv(f'{file_path}/jigsaw/train_adversarials.csv')
         
         tokenized_adversarials = []
+
+        # tokenize every sentence in A
         for row in tqdm(df_adversarial.itertuples(), total=len(df_adversarial)):
             row_adv = []
             for comment in row[3:]:
@@ -139,6 +149,11 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
 def get_eval_datasets(file_path='./data', dataset='civil_test', device='cpu', embed_lookup=None):
     '''
         returns datasets to be used for CTF metric
+
+        civil_test: civil comment  non-toxic held out identities
+        civil_train: civil comment non-toxic training identities
+
+        TODO implement getting different datasets
     '''
     
     if not embed_lookup:
