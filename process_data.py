@@ -154,11 +154,12 @@ def get_ctf_datasets(file_path='./data', dataset='civil_eval', device='cpu', emb
         df = pd.read_csv(f'{file_path}/civil_comments/civil_train_data.csv', index_col=0)
 
     # TODO: implement this synthetic -- do the processing on the fly using synthetic
-    elif dataset == 'synth_nontoxic':
-        return
-    else:
-        return
 
+    
+    elif dataset == 'synth_nontoxic':
+        return process_synthetic(False)
+    else:
+        return process_synthetic(True)
 
 
     X_comments = []
@@ -192,6 +193,47 @@ def get_ctf_datasets(file_path='./data', dataset='civil_eval', device='cpu', emb
 
     return dataset
         
+def process_synthetic(toxic):
+        synthetic_data = pd.read_csv("./data/train_df_synthetic.csv")
+        test_identities_df = pd.read_csv("./data/test_identities.txt", header=None)
+        test_identities_list = test_identities_df.values.tolist()
+
+        test_identities = []
+        for ident in test_identities_list:
+            test_identities.append(ident[0])
+
+        sentences = []
+        a = []
+        toxicity = []
+
+        for row_index in tqdm(range(len(synthetic_data))):
+            comment_text = synthetic_data.iloc[row_index]['comment_text'].split()
+            if toxic:
+                if synthetic_data.iloc[row_index]['toxic'] >= 0.5 and len(set(test_identities).intersection(comment_text)) != 0:
+                    identity = str(set(test_identities).intersection(comment_text).pop())
+                    sentences.append(synthetic_data.iloc[row_index]['comment_text'])
+                    toxicity.append(0)
+                    cur_a = []
+                    
+                    for diff_identity in test_identities:
+                        cur_a.append(synthetic_data.at[row_index, "comment_text"].replace(identity, diff_identity))
+                    a.append(cur_a)
+            else:
+                if synthetic_data.iloc[row_index]['toxic'] < 0.5 and len(set(test_identities).intersection(comment_text)) != 0:
+                    identity = str(set(test_identities).intersection(comment_text).pop())
+                    sentences.append(synthetic_data.iloc[row_index]['comment_text'])
+                    toxicity.append(0)
+                    cur_a = []
+                    
+                    for diff_identity in test_identities:
+                        cur_a.append(synthetic_data.at[row_index, "comment_text"].replace(identity, diff_identity))
+                    a.append(cur_a)
+
+        synthetic_raw = pd.DataFrame(list(zip(*a)))
+        synthetic_df = synthetic_raw.T
+        synthetic_df.insert(0, column='comment_text', value=sentences)
+
+        return synthetic_df
 
 def process_blind(df):
     '''
