@@ -15,6 +15,8 @@ parser.add_argument('--device', '-d', default='cuda' if torch.cuda.is_available(
                                                      else 'mps' if torch.backends.mps.is_available() and torch.backends.mps.is_built() 
                                                      else 'cpu', help='The device Pytorch should use cuda, mps or cpu')
 
+# TODO(???): add arguments to adjust optimizer hyperparameters
+
 args = parser.parse_args()
 
 
