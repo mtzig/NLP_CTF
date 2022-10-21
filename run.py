@@ -54,7 +54,7 @@ cc_loader = torch.utils.data.DataLoader(cc_data, batch_size=64)
 
 ctf_loaders = []
 for data in ctf_datas:
-    ctf_loaders.apped(torch.utils.data.DataLoader(data, batch_size=64))
+    ctf_loaders.append(torch.utils.data.DataLoader(data, batch_size=64))
 
 results = []
 
