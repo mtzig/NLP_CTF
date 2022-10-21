@@ -1,10 +1,10 @@
 import pandas as pd
-import numpy as np
 import torch
 from gensim.models import KeyedVectors
 from gensim.utils import tokenize
 from torch.utils.data import TensorDataset
 from tqdm import tqdm
+import re
 
 idents = ['gay', 'bisexual', 'transgender', 'trans',
        'queer', 'lgbt', 'lgbtq', 'homosexual', 'straight', 'heterosexual',
