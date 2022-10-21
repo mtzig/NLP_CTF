@@ -121,7 +121,7 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
         print(f'Accuracy: {accuracy}, Sensitivity: {sensitivity}, Specificity: {specificity}, AUC: {auc}')
 
     if get_loss:
-        return loss, accuracy, sensitivity, specificity, auc
+        return loss.item(), accuracy, sensitivity, specificity, auc
 
     return accuracy, sensitivity, specificity, auc
 
