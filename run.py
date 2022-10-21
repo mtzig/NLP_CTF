@@ -93,7 +93,7 @@ for trial in range(int(args.trials)):
 
     # TODO: evaluate tp, tn on training identity in Civil Comments
 
-    results.append(jig_results+cc_results+ctf_gaps)
+    results.append(jig_results+cc_results+tuple(ctf_gaps))
 
 
 # output results as csv
