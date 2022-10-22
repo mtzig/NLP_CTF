@@ -157,9 +157,9 @@ def get_ctf_datasets(file_path='./data', dataset='civil_eval', device='cpu', emb
 
     
     elif dataset == 'synth_nontoxic':
-        return process_synthetic(False)
+        df =  process_synthetic(toxic=False)
     else:
-        return process_synthetic(True)
+        df = process_synthetic(toxic=True)
 
 
     X_comments = []

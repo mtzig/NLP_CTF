@@ -10,6 +10,7 @@ from loss import CLP_loss, ERM_loss
 
 parser = argparse.ArgumentParser()
 parser.add_argument('train_method', help='method to train model i.e. baseline, blind, augment, CLP')
+parser.add_argument('--lambda_clp', '-l', default=0.05, help='the lambda value, only applicable if CLP is used, defaults to 0.05')
 parser.add_argument('--verbose', '-v', action='store_true', help='Print results')
 parser.add_argument('--trials', '-t', default=10, help='The number of trials to run, defaults to 10')
 parser.add_argument('--epochs', '-e', default=5, help='The number of epochs to train model, defaults to 5')
@@ -22,7 +23,7 @@ parser.add_argument('--device', '-d', default='cuda' if torch.cuda.is_available(
 
 args = parser.parse_args()
 
-
+print(type(args.trials), type(args.lambda_clp))
 DEVICE = args.device
 
 # load word2vec into gensim model
@@ -66,11 +67,11 @@ for trial in range(int(args.trials)):
     model = None
     gc.collect()
     torch.cuda.empty_cache()
-
+    
     # initialize models    
     model = CNNClassifier(pretrained_embed,device=DEVICE)
     if args.train_method == 'CLP':
-        loss_fn = CLP_loss(torch.nn.CrossEntropyLoss(), A)
+        loss_fn = CLP_loss(torch.nn.CrossEntropyLoss(), A, lmbda=float(args.lambda_clp))
     else:
         loss_fn = ERM_loss(torch.nn.CrossEntropyLoss())
     optimizer = torch.optim.AdamW(model.parameters())
