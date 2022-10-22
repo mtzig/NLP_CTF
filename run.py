@@ -23,13 +23,14 @@ parser.add_argument('--device', '-d', default='cuda' if torch.cuda.is_available(
 
 args = parser.parse_args()
 
-print(type(args.trials), type(args.lambda_clp))
 DEVICE = args.device
 
 # load word2vec into gensim model
+print('loading word embeddings')
 embed_lookup = init_embed_lookup()
 pretrained_embed = torch.from_numpy(embed_lookup.vectors)
-
+print('done')
+print('loading datasets')
 # get datasets
 if args.train_method == 'CLP':
     train_data, A = get_jigsaw_datasets(device=DEVICE, data_type='CLP', embed_lookup=embed_lookup)
@@ -56,12 +57,14 @@ cc_loader = torch.utils.data.DataLoader(cc_data, batch_size=64)
 ctf_loaders = []
 for data in ctf_datas:
     ctf_loaders.append(torch.utils.data.DataLoader(data, batch_size=64))
+print('done')
 
 results = []
 
 for trial in range(int(args.trials)):
-    print(f'Trial {trial+1}/{int(args.trials)}')
+    print('{:=^50}'.format(f'Trial {trial+1}/{int(args.trials)}'))
 
+    print('initializing model')
     # first we do garbage collection,
     # as torch sometimes does not free model when we reinitialize it
     model = None
@@ -76,11 +79,13 @@ for trial in range(int(args.trials)):
         loss_fn = ERM_loss(torch.nn.CrossEntropyLoss())
     optimizer = torch.optim.AdamW(model.parameters())
 
+    print('done')
     # train model
     for epoch in range(int(args.epochs)):
         print(f'Epoch {epoch+1}/{int(args.epochs)}')
         train(train_loader, model, loss_fn, optimizer, verbose=args.verbose)
 
+    print('evaluating model')
     # evaluate loss/accuracy/sensitivity/specificity/AUC on Jigsaw dev set
     jig_results = evaluate(jig_loader, model, get_loss=True, verbose=args.verbose)
 
@@ -96,6 +101,7 @@ for trial in range(int(args.trials)):
 
     results.append(jig_results+cc_results+tuple(ctf_gaps))
 
+    'done'
 
 # output results as csv
 columns = ('jig_loss', 'jig_accuracy', 'jig_tp', 'jig_tn', 'jig_auc',
@@ -104,5 +110,8 @@ columns = ('jig_loss', 'jig_accuracy', 'jig_tp', 'jig_tn', 'jig_auc',
             #'ctf_synth_toxic', 'ctf_synth_nontoxic'
             )
 
+print('outputting results to csv')
 df_results = pd.DataFrame(np.array(results), columns=columns)
 df_results.to_csv(f'{args.test_name}.csv', index=False)
+print('done')
+print('experient finished')
