@@ -186,9 +186,9 @@ def get_ctf_datasets(file_path='./data', dataset='civil_eval', device='cpu', emb
 
     
     elif dataset == 'synth_nontoxic':
-        df =  process_synthetic(toxic=False)
+        df = pd.read_csv(f'{file_path}/synthetic/synthetic_nontoxic_df.csv', index_col=0)
     else:
-        df = process_synthetic(toxic=True)
+        df = pd.read_csv(f'{file_path}/synthetic/synthetic_toxic_df.csv', index_col=0)
 
 
     X_comments = []

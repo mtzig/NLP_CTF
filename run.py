@@ -45,9 +45,8 @@ cc_data = get_CivilComments_Datasets(device=DEVICE, embed_lookup=embed_lookup)
 cc_idents_data = get_CivilComments_idents_Datasets(device=DEVICE, embed_lookup=embed_lookup)
 
 # initialize every ctf datasets
-# TODO: implement code to get synth_toxic and synth_nontoxic
 ctf_datas = []
-for dataset in ('civil_eval', 'civil_train'):#, 'synth_toxic', 'synth_nontoxic'):
+for dataset in ('civil_eval', 'civil_train', 'synth_toxic', 'synth_nontoxic'):
     ctf_datas.append(get_ctf_datasets(device=DEVICE, dataset=dataset, embed_lookup=embed_lookup))
 
 # load into dataloader
@@ -113,7 +112,7 @@ columns = ('jig_loss', 'jig_accuracy', 'jig_tp', 'jig_tn', 'jig_auc',
             'cc_loss', 'cc_accuracy', 'cc_tp', 'cc_tn', 'cc_auc',
             'cci_loss', 'cci_accuracy', 'cci_tp', 'cci_tn', 'cci_auc',
             'ctf_cc_eval', 'ctf_cc_train',
-            #'ctf_synth_toxic', 'ctf_synth_nontoxic'
+            'ctf_synth_toxic', 'ctf_synth_nontoxic',
             )
 
 print('outputting results to csv')
