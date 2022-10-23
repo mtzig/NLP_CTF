@@ -128,9 +128,9 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
    
     #only need metadata for CLP, otherwise we just use some dummy data
     if data_type == 'CLP':
-        M = torch.tensor(df_train['index'])
+        M = torch.tensor(df_train['index'], device=device)
     else:
-        M = torch.zeros(len(df_train)) 
+        M = torch.zeros(len(df_train), device=device) 
 
     padded_id = []
     for comment in tqdm(df_train['comment_text']):
