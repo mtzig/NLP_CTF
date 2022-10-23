@@ -3,10 +3,11 @@ import torch
 import gc
 import numpy as np
 import pandas as pd
-from process_data import get_jigsaw_datasets, init_embed_lookup, get_ctf_datasets, get_CivilComments_Datasets, get_jigsaw_dev_data
+from process_data import get_jigsaw_datasets, init_embed_lookup, get_ctf_datasets, get_CivilComments_Datasets, get_jigsaw_dev_data, get_CivilComments_idents_Datasets
 from models import CNNClassifier
 from train_eval import train, evaluate, CTF
 from loss import CLP_loss, ERM_loss
+from torch.utils.data import DataLoader
 
 parser = argparse.ArgumentParser()
 parser.add_argument('train_method', help='method to train model i.e. baseline, blind, augment, CLP')
@@ -40,7 +41,8 @@ else:
 jig_dev_data = get_jigsaw_dev_data(device=DEVICE, embed_lookup=embed_lookup)
 
 # initialize civil commemts test dataset, so that we can evaluate performance on that too
-cc_data = get_CivilComments_Datasets(device=DEVICE)
+cc_data = get_CivilComments_Datasets(device=DEVICE, embed_lookup=embed_lookup)
+cc_idents_data = get_CivilComments_idents_Datasets(device=DEVICE, embed_lookup=embed_lookup)
 
 # initialize every ctf datasets
 # TODO: implement code to get synth_toxic and synth_nontoxic
@@ -49,14 +51,15 @@ for dataset in ('civil_eval', 'civil_train'):#, 'synth_toxic', 'synth_nontoxic')
     ctf_datas.append(get_ctf_datasets(device=DEVICE, dataset=dataset, embed_lookup=embed_lookup))
 
 # load into dataloader
-train_loader =  torch.utils.data.DataLoader(train_data, batch_size=64)
-jig_loader = torch.utils.data.DataLoader(jig_dev_data, batch_size=64)
+train_loader = DataLoader(train_data, batch_size=64)
+jig_loader = DataLoader(jig_dev_data, batch_size=64)
 
-cc_loader = torch.utils.data.DataLoader(cc_data, batch_size=64)
+cc_loader = DataLoader(cc_data, batch_size=64)
+cc_idents_loader = DataLoader(cc_idents_data, batch_size=64)
 
 ctf_loaders = []
 for data in ctf_datas:
-    ctf_loaders.append(torch.utils.data.DataLoader(data, batch_size=64))
+    ctf_loaders.append(DataLoader(data, batch_size=64))
 print('done')
 
 results = []
@@ -92,6 +95,9 @@ for trial in range(int(args.trials)):
     # evaluate loss/accuracy/sensitivity/specificity/AUC on civil comments test set
     cc_results = evaluate(cc_loader, model, get_loss=True, verbose=args.verbose)
 
+    # evaluate loss/accuracy/sensitivity/specificity/AUC on civil comments idents only test set
+    cc_idents_results = evaluate(cc_idents_loader, model, get_loss=True, verbose=args.verbose)
+
     # evaluate CTF gap over every eval dataset
     ctf_gaps = []
     for ctf_loader in ctf_loaders:
@@ -99,13 +105,13 @@ for trial in range(int(args.trials)):
 
     # TODO: evaluate tp, tn on training identity in Civil Comments
 
-    results.append(jig_results+cc_results+tuple(ctf_gaps))
+    results.append(jig_results+cc_results+cc_idents_results+tuple(ctf_gaps))
 
-    'done'
 
 # output results as csv
 columns = ('jig_loss', 'jig_accuracy', 'jig_tp', 'jig_tn', 'jig_auc',
             'cc_loss', 'cc_accuracy', 'cc_tp', 'cc_tn', 'cc_auc',
+            'cci_loss', 'cci_accuracy', 'cci_tp', 'cci_tn', 'cci_auc',
             'ctf_cc_eval', 'ctf_cc_train',
             #'ctf_synth_toxic', 'ctf_synth_nontoxic'
             )

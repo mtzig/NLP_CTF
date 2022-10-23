@@ -44,6 +44,35 @@ def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
     
     return TensorDataset(features, labels)
 
+def get_CivilComments_idents_Datasets(device='cpu', embed_lookup=None):
+    '''
+        returns subset of CivilComments dataset only with identity
+    '''
+
+    if not embed_lookup:
+        embed_lookup = init_embed_lookup()
+
+    df_nontoxic = pd.read_csv(f'./data/civil_comments/civil_train_data.csv', index_col=0)
+    df_toxic = pd.read_csv(f'./data/civil_comments/civil_toxic_train_data.csv', index_col=0)
+
+    df_nontoxic['toxicity'] = 0
+    df_toxic['toxicity'] = 1
+
+    df_idents = pd.concat([df_nontoxic[['comment_text', 'toxicity']], df_toxic[['comment_text', 'toxicity']]])
+
+    padded_id = []
+    for comment in tqdm(df_idents['comment_text'].values):
+        seq = tokenize(comment)
+        id = get_id(seq, embed_lookup)
+        padded_id.append(pad_seq(id))
+    
+    features = torch.tensor(padded_id, device=device)
+
+    labels = torch.from_numpy(df_idents['toxicity'].values).to(device)
+    labels = labels.to(device).long()
+    
+    return TensorDataset(features, labels)
+
 
 
 def get_jigsaw_dev_data(file_path='./data', device='cpu', embed_lookup=None):
