@@ -2,7 +2,7 @@ import torch
 
 class CLP_loss:
 
-    def __init__(self, loss_fn, A, lmbda=0.05):
+    def __init__(self, loss_fn, A, lmbda=0.05, only_nontox=False):
 
         self.loss_fn = loss_fn
 
@@ -16,6 +16,8 @@ class CLP_loss:
 
         self.device = A.device
 
+        self.only_nontox = only_nontox
+
     def __call__(self, model, minibatch):
 
         X, y, M = minibatch
@@ -23,6 +25,11 @@ class CLP_loss:
         loss = self.loss_fn(model(X), y)
         
         ident_comments = (M != -1)
+
+        # only does clp on nontoxic comments
+        if self.only_nontox:
+            ident_comments = torch.logical_and(ident_comments, (y==1))
+
         num_ident_comments = sum(ident_comments)
 
         if num_ident_comments != 0:

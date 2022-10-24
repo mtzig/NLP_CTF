@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader
 parser = argparse.ArgumentParser()
 parser.add_argument('train_method', help='method to train model i.e. baseline, blind, augment, CLP')
 parser.add_argument('--lambda_clp', '-l', default=0.05, help='the lambda value, only applicable if CLP is used, defaults to 0.05')
+parser.add_argument('--nontoxic', '-x', action='store_true', help='only uses nontoxic comments, only applicable if CLP is used')
 parser.add_argument('--verbose', '-v', action='store_true', help='Print results')
 parser.add_argument('--trials', '-t', default=10, help='The number of trials to run, defaults to 10')
 parser.add_argument('--epochs', '-e', default=5, help='The number of epochs to train model, defaults to 5')
@@ -45,9 +46,8 @@ cc_data = get_CivilComments_Datasets(device=DEVICE, embed_lookup=embed_lookup)
 cc_idents_data = get_CivilComments_idents_Datasets(device=DEVICE, embed_lookup=embed_lookup)
 
 # initialize every ctf datasets
-# TODO: implement code to get synth_toxic and synth_nontoxic
 ctf_datas = []
-for dataset in ('civil_eval', 'civil_train'):#, 'synth_toxic', 'synth_nontoxic'):
+for dataset in ('civil_eval', 'civil_train', 'synth_toxic', 'synth_nontoxic'):
     ctf_datas.append(get_ctf_datasets(device=DEVICE, dataset=dataset, embed_lookup=embed_lookup))
 
 # load into dataloader
@@ -77,7 +77,7 @@ for trial in range(int(args.trials)):
     # initialize models    
     model = CNNClassifier(pretrained_embed,device=DEVICE)
     if args.train_method == 'CLP':
-        loss_fn = CLP_loss(torch.nn.CrossEntropyLoss(), A, lmbda=float(args.lambda_clp))
+        loss_fn = CLP_loss(torch.nn.CrossEntropyLoss(), A, lmbda=float(args.lambda_clp), only_nontox=args.nontoxic)
     else:
         loss_fn = ERM_loss(torch.nn.CrossEntropyLoss())
     optimizer = torch.optim.AdamW(model.parameters())
@@ -113,7 +113,7 @@ columns = ('jig_loss', 'jig_accuracy', 'jig_tp', 'jig_tn', 'jig_auc',
             'cc_loss', 'cc_accuracy', 'cc_tp', 'cc_tn', 'cc_auc',
             'cci_loss', 'cci_accuracy', 'cci_tp', 'cci_tn', 'cci_auc',
             'ctf_cc_eval', 'ctf_cc_train',
-            #'ctf_synth_toxic', 'ctf_synth_nontoxic'
+            'ctf_synth_toxic', 'ctf_synth_nontoxic',
             )
 
 print('outputting results to csv')

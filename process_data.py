@@ -128,9 +128,9 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
    
     #only need metadata for CLP, otherwise we just use some dummy data
     if data_type == 'CLP':
-        M = torch.tensor(df_train['index'])
+        M = torch.tensor(df_train['index'], device=device)
     else:
-        M = torch.zeros(len(df_train)) 
+        M = torch.zeros(len(df_train), device=device) 
 
     padded_id = []
     for comment in tqdm(df_train['comment_text']):
@@ -186,9 +186,9 @@ def get_ctf_datasets(file_path='./data', dataset='civil_eval', device='cpu', emb
 
     
     elif dataset == 'synth_nontoxic':
-        df =  process_synthetic(toxic=False)
+        df = pd.read_csv(f'{file_path}/synthetic/synthetic_nontoxic_df.csv', index_col=0)
     else:
-        df = process_synthetic(toxic=True)
+        df = pd.read_csv(f'{file_path}/synthetic/synthetic_toxic_df.csv', index_col=0)
 
 
     X_comments = []
