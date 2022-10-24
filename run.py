@@ -103,8 +103,6 @@ for trial in range(int(args.trials)):
     for ctf_loader in ctf_loaders:
         ctf_gaps.append(CTF(ctf_loader, model))
 
-    # TODO: evaluate tp, tn on training identity in Civil Comments
-
     results.append(jig_results+cc_results+cc_idents_results+tuple(ctf_gaps))
 
 
