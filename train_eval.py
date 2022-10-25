@@ -2,6 +2,9 @@
 from tqdm import tqdm
 import torch
 from sklearn.metrics import roc_auc_score
+from process_data import init_embed_lookup, get_id, pad_seq
+from gensim.utils import tokenize
+
 
 def train(dataloader, model, loss_fn, optimizer, verbose=False):
     '''
@@ -156,4 +159,29 @@ def CTF(dataloader, model):
 
     return (cum_gap / num_examples).item()
 
+def get_pred(comment_text, model, embed_lookup=None):
+    '''
+    On input string
+
+    returns its logit and probability of being toxic
+    '''
+
+    if not embed_lookup:
+        embed_lookup = init_embed_lookup()
+
+    DEVICE = next(model.parameters()).device
+
+    seq = tokenize(comment_text)
+    id = pad_seq(get_id(seq, embed_lookup))
+    
+    input = torch.tensor(id, device=DEVICE).unsqueeze(0)
+
+    model.eval()
+
+    with torch.no_grad():
+
+        logit = model(input)
+        pred = torch.nn.functional.softmax(logit, dim=1)[0,1]
+
+    return logit.tolist()[0], pred.item()
 
