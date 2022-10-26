@@ -103,6 +103,8 @@ def get_jigsaw_dev_data(file_path='./data', device='cpu', embed_lookup=None):
     return TensorDataset(X, y)
 
 def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', embed_lookup=None):
+    # TODO: Add regex for preproccessing ident columns
+    
     '''
     return datasets of the form X,y,M where M is metadata
 
@@ -118,8 +120,18 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
         embed_lookup = init_embed_lookup()
 
     # Create df with train data
-    df_train = pd.read_csv(f'{file_path}/jigsaw/train_with_idents.csv')
-
+    if data_type == 'baseline':
+        df_train = pd.read_csv(f'{file_path}/jigsaw/train_with_idents.csv')
+    else:
+        df_train = pd.read_csv(f'{file_path}/jigsaw/train.csv')
+        df_train = df_train.drop(df_train.columns[3:8], axis=1)
+        for row_index, row in enumerate(df_train.itertuples()):
+            for index, identity in enumerate(idents):
+                if identity in row[2]:
+                    df_train.at[row_index, identity] = 1
+                else:
+                    df_train.at[row_index, identity] = 0
+        
     if data_type == 'blind':
         df_train = process_blind(df_train)
     elif data_type == 'augment':
@@ -292,20 +304,18 @@ def process_augment(df):
     df_identities = df[df.identity==1].reset_index()
     comment_list = []
     toxic_list = []
-    augmented = []
 
     for row_index in tqdm(range(len(df_identities))):
         for identity in idents:
+            regex = r'\b' + re.escape(identity) + r'\b'
             if df_identities.at[row_index, identity] == 1:
                 comment_list.append(df_identities.at[row_index, "comment_text"])
                 toxic_list.append(df_identities.at[row_index, "toxic"])
-                augmented.append(0)
                 for diff_identity in idents:
                     if diff_identity == identity:
-                        break
-                    comment_list.append(df_identities.at[row_index, "comment_text"].replace(identity, diff_identity))
+                        continue
+                    comment_list.append(re.sub(regex, diff_identity, df_identities.at[row_index, "comment_text"], flags=re.IGNORECASE))
                     toxic_list.append(df_identities.at[row_index, "toxic"])
-                    augmented.append(1)
      
     data_tuples = list(zip(comment_list, toxic_list))
     train_df_augment = pd.DataFrame(data_tuples, columns=['comment_text','toxic'])
