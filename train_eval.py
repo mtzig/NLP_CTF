@@ -128,7 +128,7 @@ def evaluate(dataloader, model, get_loss=False, verbose=False):
 
     return accuracy, sensitivity, specificity, auc
 
-def CTF(dataloader, model):
+def CTF(dataloader, model, verbose=False):
     '''
         Calculates the CTF gap
 
@@ -157,7 +157,12 @@ def CTF(dataloader, model):
 
             num_examples += l * i
 
-    return (cum_gap / num_examples).item()
+    ctf_gap =  (cum_gap / num_examples).item()
+
+    if verbose:
+        print(f'CTF gap: {ctf_gap}')
+
+    return ctf_gap
 
 def get_pred(comment_text, model, embed_lookup=None):
     '''

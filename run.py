@@ -101,7 +101,7 @@ for trial in range(int(args.trials)):
     # evaluate CTF gap over every eval dataset
     ctf_gaps = []
     for ctf_loader in ctf_loaders:
-        ctf_gaps.append(CTF(ctf_loader, model))
+        ctf_gaps.append(CTF(ctf_loader, model, verbose=args.verbose))
 
     results.append(jig_results+cc_results+cc_idents_results+tuple(ctf_gaps))
 
