@@ -15,7 +15,7 @@ class CNNClassifier(nn.Module):
     }
     '''
 
-    def __init__(self, pretrained_embed, num_classes=2, num_feature_maps=100, kernel_sizes=(3, 4, 5), p_dropout=0.5, device='cpu'):
+    def __init__(self, pretrained_embed, num_classes=2, num_feature_maps=300, kernel_sizes=(2, 3, 4, 5), p_dropout=0.5, device='cpu'):
         super().__init__()
 
         embed_dim = pretrained_embed.shape[1]

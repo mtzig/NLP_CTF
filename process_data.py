@@ -6,6 +6,9 @@ from torch.utils.data import TensorDataset
 from tqdm import tqdm
 import re
 
+
+# TODO: implement function that gets train identities
+
 idents = ['gay', 'bisexual', 'transgender', 'trans',
        'queer', 'lgbt', 'lgbtq', 'homosexual', 'straight', 'heterosexual',
        'male', 'female', 'nonbinary', 'african', 'black',
