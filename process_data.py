@@ -328,8 +328,17 @@ def process_augment(df):
 
 
 
-def init_embed_lookup(file_path='./data/GoogleNews-vectors-negative300.bin'):
-    return KeyedVectors.load_word2vec_format(file_path, binary=True)
+def init_embed_lookup(word2vec=True, file_path='./data'):
+    '''
+    intializes the embeddings
+
+    either word2vec or glove
+    '''
+    if word2vec:
+        return KeyedVectors.load_word2vec_format(f'{file_path}/GoogleNews-vectors-negative300.bin', binary=True)
+    
+    return KeyedVectors.load_word2vec_format(f'{file_path}/glove_6B_300d.txt', binary=False, no_header=True)
+
 
 def get_id(seq, embed_lookup):
 

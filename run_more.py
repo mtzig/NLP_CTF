@@ -24,6 +24,9 @@ parser.add_argument('--verbose', '-v', action='store_true', help='Print results'
 parser.add_argument('--trials', '-t', default=3, help='The number of trials to run, defaults to 10')
 parser.add_argument('--epochs', '-e', default=15, help='The number of epochs to train model, defaults to 5')
 parser.add_argument('--test_name', '-n', default='test', help='The name of the test to run (defaults to "test"), the output files will be saved in the directory ./[name].csv')
+parser.add_argument('--glove', '-g', action='store_false', help='uses glove instead of word2vec')
+parser.add_argument('--featuremaps', '-f', default=100, help='number of feature maps for model to use, defaults to 100')
+parser.add_argument('--kernelsizes', '-k', default=(2,3,4,5), nargs="+", type=int, help='kernel sizes to use to intialize model defaults to (2,3,4,5)')
 parser.add_argument('--device', '-d', default='cuda' if torch.cuda.is_available() 
                                                      else 'mps' if torch.backends.mps.is_available() and torch.backends.mps.is_built() 
                                                      else 'cpu', help='The device Pytorch should use cuda, mps or cpu')
@@ -36,7 +39,7 @@ DEVICE = args.device
 
 # load word2vec into gensim model
 print('loading word embeddings')
-embed_lookup = init_embed_lookup()
+embed_lookup = init_embed_lookup(word2vec=args.glove)
 pretrained_embed = torch.from_numpy(embed_lookup.vectors)
 print('done')
 print('loading datasets')
@@ -84,7 +87,7 @@ for trial in range(int(args.trials)):
     torch.cuda.empty_cache()
     
     # initialize models    
-    model = CNNClassifier(pretrained_embed,device=DEVICE)
+    model = CNNClassifier(pretrained_embed,device=DEVICE, num_feature_maps=args.featuremaps, kernel_sizes=args.kernelsizes)
     if args.train_method == 'CLP':
         loss_fn = CLP_loss(torch.nn.CrossEntropyLoss(), A, lmbda=float(args.lambda_clp), only_nontox=args.nontoxic)
     else:
@@ -117,11 +120,6 @@ for trial in range(int(args.trials)):
     results.append(trial_results)
 
 
-#
-# [[[res], [res], [res]], [[res], [res], [res]]]
-#
-#
-#
 
 # output results as csv
 columns = ('jig_loss', 'jig_accuracy', 'jig_tp', 'jig_tn', 'jig_auc',
