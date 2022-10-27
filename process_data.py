@@ -120,14 +120,13 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
         embed_lookup = init_embed_lookup()
 
     # Create df with train data
-    if data_type == 'baseline':
-        df_train = pd.read_csv(f'{file_path}/jigsaw/train_with_idents.csv')
-    else:
-        df_train = pd.read_csv(f'{file_path}/jigsaw/train.csv')
-        df_train = df_train.drop(df_train.columns[3:8], axis=1)
+    df_train = pd.read_csv(f'{file_path}/jigsaw/train.csv')
+    df_train = df_train.drop(df_train.columns[3:8], axis=1)
+    if data_type != 'baseline':
         for row_index, row in enumerate(df_train.itertuples()):
             for index, identity in enumerate(idents):
-                if identity in row[2]:
+                regex = r'\b' + re.escape(identity) + r'\b'
+                if regex.search(row[2]):
                     df_train.at[row_index, identity] = 1
                 else:
                     df_train.at[row_index, identity] = 0
