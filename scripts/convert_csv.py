@@ -108,9 +108,9 @@ def generate_synthetic_data(toxic, path, identity_list):
 def main():
     train_ids, test_ids = create_splits("../data/adjectives_people.txt")
 
-    civil_test = generate_civil_data(False, "../data/all_data_with_identities.csv", test_ids)
-    civil_train_toxic = generate_civil_data(True, "../data/all_data_with_identities.csv", train_ids)
-    civil_train_nontoxic = generate_civil_data(False, "../data/all_data_with_identities.csv", train_ids)
+    civil_test = generate_civil_data(False, "../data/civil_comments/civil_comments.csv", test_ids)
+    civil_train_toxic = generate_civil_data(True, "../data/civil_comments/civil_comments.csv", train_ids)
+    civil_train_nontoxic = generate_civil_data(False, "../data/civil_comments/civil_comments.csv", train_ids)
     
     synthetic_toxic = generate_synthetic_data(True, "../data/bias_madlibs_89k.csv", train_ids)
     synthetic_nontoxic = generate_synthetic_data(False, "../data/bias_madlibs_89k.csv", train_ids)
