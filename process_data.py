@@ -128,7 +128,7 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
     if data_type != 'baseline':
         for row_index, row in enumerate(df_train.itertuples()):
             for index, identity in enumerate(idents):
-                regex = r'\b' + re.escape(identity) + r'\b'
+                regex = re.compile(r'\b' + re.escape(identity) + r'\b')
                 if regex.search(row[2]):
                     df_train.at[row_index, identity] = 1
                 else:
