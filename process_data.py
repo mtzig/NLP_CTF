@@ -7,16 +7,8 @@ from tqdm import tqdm
 import re
 
 
-# TODO: implement function that gets train identities
 
-idents = ['gay', 'bisexual', 'transgender', 'trans',
-       'queer', 'lgbt', 'lgbtq', 'homosexual', 'straight', 'heterosexual',
-       'male', 'female', 'nonbinary', 'african', 'black',
-       'white', 'european', 'hispanic', 'latino',
-       'buddhist', 'catholic', 'protestant', 'sikh', 'taoist', 
-       'old', 'older', 'young',
-       'younger', 'teenage', 'millenial', 'elderly', 'blind',
-       'deaf', 'paralyzed', 'lesbian']
+idents = tuple(pd.read_csv('./data/random_split_data/train_identities.txt', header=None).iloc[:,0].astype('string'))
 
 
 def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
