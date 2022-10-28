@@ -132,7 +132,7 @@ columns = ('jig_loss', 'jig_accuracy', 'jig_tp', 'jig_tn', 'jig_auc',
 print('outputting results to csv')
 
 # averages results over trials
-results = np.average(np.array(tuple(zip(*results))), axis=0)
+results = np.average(np.array(tuple(zip(*results))), axis=1)
 
 df_results = pd.DataFrame(results, columns=columns)
 df_results.to_csv(f'{args.test_name}.csv', index=False)
