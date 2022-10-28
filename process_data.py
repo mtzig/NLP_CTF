@@ -7,7 +7,16 @@ from tqdm import tqdm
 import re
 
 
-idents = tuple(pd.read_csv('./data/random_split_data/train_identities.txt', header=None).iloc[:,0].astype('string'))
+# TODO: implement function that gets train identities
+
+idents = ['gay', 'bisexual', 'transgender', 'trans',
+       'queer', 'lgbt', 'lgbtq', 'homosexual', 'straight', 'heterosexual',
+       'male', 'female', 'nonbinary', 'african', 'black',
+       'white', 'european', 'hispanic', 'latino',
+       'buddhist', 'catholic', 'protestant', 'sikh', 'taoist', 
+       'old', 'older', 'young',
+       'younger', 'teenage', 'millenial', 'elderly', 'blind',
+       'deaf', 'paralyzed', 'lesbian']
 
 
 def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
@@ -46,8 +55,8 @@ def get_CivilComments_idents_Datasets(device='cpu', embed_lookup=None):
     if not embed_lookup:
         embed_lookup = init_embed_lookup()
 
-    df_nontoxic = pd.read_csv(f'./data/random_split_data/civil_train_data.csv', index_col=0)
-    df_toxic = pd.read_csv(f'./data/random_split_data/civil_toxic_train_data.csv', index_col=0)
+    df_nontoxic = pd.read_csv(f'./data/civil_comments/civil_train_data.csv', index_col=0)
+    df_toxic = pd.read_csv(f'./data/civil_comments/civil_toxic_train_data.csv', index_col=0)
 
     df_nontoxic['toxicity'] = 0
     df_toxic['toxicity'] = 1
@@ -119,7 +128,7 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
     if data_type != 'baseline':
         for row_index, row in enumerate(df_train.itertuples()):
             for index, identity in enumerate(idents):
-                regex = r'\b' + re.escape(identity) + r'\b'
+                regex = re.compile(r'\b' + re.escape(identity) + r'\b')
                 if regex.search(row[2]):
                     df_train.at[row_index, identity] = 1
                 else:
@@ -183,17 +192,17 @@ def get_ctf_datasets(file_path='./data', dataset='civil_eval', device='cpu', emb
         embed_lookup = init_embed_lookup()
 
     if dataset == 'civil_eval':
-        df = pd.read_csv(f'{file_path}/random_split_data/civil_test_data.csv', index_col=0)
+        df = pd.read_csv(f'{file_path}/civil_comments/civil_test_data.csv', index_col=0)
     elif dataset == 'civil_train':
-        df = pd.read_csv(f'{file_path}/random_split_data/civil_train_data.csv', index_col=0)
+        df = pd.read_csv(f'{file_path}/civil_comments/civil_train_data.csv', index_col=0)
 
     # TODO: implement this synthetic -- do the processing on the fly using synthetic
 
     
     elif dataset == 'synth_nontoxic':
-        df = pd.read_csv(f'{file_path}/random_split_data/synthetic_nontoxic_df.csv', index_col=0)
+        df = pd.read_csv(f'{file_path}/synthetic/synthetic_nontoxic_df.csv', index_col=0)
     else:
-        df = pd.read_csv(f'{file_path}/random_split_data/synthetic_toxic_df.csv', index_col=0)
+        df = pd.read_csv(f'{file_path}/synthetic/synthetic_toxic_df.csv', index_col=0)
 
 
     X_comments = []
@@ -277,8 +286,17 @@ def process_augment(df):
 
 
 
-def init_embed_lookup(file_path='./data/GoogleNews-vectors-negative300.bin'):
-    return KeyedVectors.load_word2vec_format(file_path, binary=True)
+def init_embed_lookup(word2vec=True, file_path='./data'):
+    '''
+    intializes the embeddings
+
+    either word2vec or glove
+    '''
+    if word2vec:
+        return KeyedVectors.load_word2vec_format(f'{file_path}/GoogleNews-vectors-negative300.bin', binary=True)
+    
+    return KeyedVectors.load_word2vec_format(f'{file_path}/glove_6B_300d.txt', binary=False, no_header=True)
+
 
 def get_id(seq, embed_lookup):
 
