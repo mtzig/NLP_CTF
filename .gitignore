@@ -144,3 +144,4 @@ all_data_with_identities.csv
 /data/GoogleNews-vectors-negative300.bin
 /data/civil_comments/civil_comments.csv
 /data/glove_6B_300d.txt
+/data/glove_840B_300d.txt
