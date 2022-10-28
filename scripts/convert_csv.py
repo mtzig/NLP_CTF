@@ -9,11 +9,9 @@ def create_splits(path):
         input: path to full identity list
         output: returns 2 random identity lists: training and test
     '''
-    identities = pd.read_csv(path)
 
-    # when list is converted to numpy array, deletes first element (lesbian)
+    identities = pd.read_csv(path, header=None)
     identity_array = identities.to_numpy()
-    identity_array = np.append(identity_array, 'lesbian')
     identity_list = identity_array.tolist()
 
     # remove the bigrams from the training set
