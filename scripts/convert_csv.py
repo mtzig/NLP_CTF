@@ -59,15 +59,14 @@ def generate_civil_data(toxic, path, identity_list):
     a = []
 
     # go through the input data set and create modified civil data
-    for row in tqdm(df.itertuples(index=False)):
-        comment_text = row[2] # comment is third column in row        
-        identity = identity_regex.search(comment_text)[0].lower()
+    for comment_text in tqdm(df['comment_text']):
+        identity = identity_regex.search(comment_text)[0]
         sentences.append(comment_text)
 
         # generate adversarial
         cur_a = []
         for diff_identity in identity_list:
-            if diff_identity == identity:
+            if diff_identity == identity.lower():
                 continue
             cur_a.append(comment_text.replace(identity, diff_identity))
         a.append(cur_a)
