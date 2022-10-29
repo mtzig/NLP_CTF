@@ -3,6 +3,7 @@ import numpy as np
 from tqdm import tqdm
 from pathlib import Path
 import random
+import re
 
 def create_splits(path):
     '''
@@ -45,36 +46,32 @@ def generate_civil_data(toxic, path, identity_list):
     '''
     df = pd.read_csv(path)
 
-    # the three "columns" in our modified data set
+
+
+    identity_regex = re.compile('|'.join(identity_list), re.IGNORECASE)
+    
+    df = df[(df['toxicity'] >= 0.5) == toxic]
+    df = df[np.where(df['comment_text'].str.split().str.len()<=10, True, False)]
+    df = df[np.where(df['comment_text'].str.contains(identity_regex), True, False)]
+
+    # the "columns" in our modified data set
     sentences = []
     a = []
-    toxicity = []
 
     # go through the input data set and create modified civil data
-    for row_index in tqdm(range(len(df))):
-        comment_text = df.iloc[row_index]['comment_text'].split()
-        if toxic:
-            if df.iloc[row_index]['toxicity'] >= 0.5 and len(comment_text) <= 10 and len(set(identity_list).intersection(comment_text)) != 0:
-                identity = str(set(identity_list).intersection(comment_text).pop())
-                sentences.append(df.iloc[row_index]['comment_text'])
-                toxicity.append(0)
-                cur_a = []
+    for row in tqdm(df.itertuples(index=False)):
+        comment_text = row[2] # comment is third column in row        
+        identity = identity_regex.search(comment_text)[0].lower()
+        sentences.append(comment_text)
 
-                for diff_identity in identity_list:
-                    cur_a.append(df.at[row_index, "comment_text"].replace(identity, diff_identity))
-                a.append(cur_a)
-        else:
-            if df.iloc[row_index]['toxicity'] < 0.5 and len(comment_text) <= 10 and len(set(identity_list).intersection(comment_text)) != 0:
-                identity = str(set(identity_list).intersection(comment_text).pop())
-                sentences.append(df.iloc[row_index]['comment_text'])
-                toxicity.append(0)
-                cur_a = []
+        # generate adversarial
+        cur_a = []
+        for diff_identity in identity_list:
+            if diff_identity == identity:
+                continue
+            cur_a.append(comment_text.replace(identity, diff_identity))
+        a.append(cur_a)
 
-                for diff_identity in identity_list:
-                    cur_a.append(df.at[row_index, "comment_text"].replace(identity, diff_identity))
-                a.append(cur_a)
-
-    # gets the a, sentences, and toxicity to create a data set
     return_df_raw = pd.DataFrame(list(zip(*a)))
     return_df = return_df_raw.T
     return_df.insert(0, column='comment_text', value=sentences)
@@ -133,7 +130,7 @@ def main():
     civil_test = generate_civil_data(False, "../data/civil_comments/civil_comments.csv", test_ids)
     civil_train_toxic = generate_civil_data(True, "../data/civil_comments/civil_comments.csv", train_ids)
     civil_train_nontoxic = generate_civil_data(False, "../data/civil_comments/civil_comments.csv", train_ids)
-    
+
     synthetic_toxic = generate_synthetic_data(True, "../data/bias_madlibs_89k.csv", train_ids)
     synthetic_nontoxic = generate_synthetic_data(False, "../data/bias_madlibs_89k.csv", train_ids)
     
