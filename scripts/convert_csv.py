@@ -10,7 +10,7 @@ def create_splits(path):
         output: returns 2 random identity lists: training and test
     '''
 
-    identities = pd.read_csv(path, header=None)
+    identities = pd.read_csv(path, header=None)[0]
     identity_array = identities.to_numpy()
     identity_list = identity_array.tolist()
 
