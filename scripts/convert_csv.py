@@ -50,9 +50,9 @@ def generate_civil_data(toxic, path, identity_list):
 
     identity_regex = re.compile(r'\b' + '|'.join(identity_list) + '[ing|s|es|.|,|!|?|;]*' + r'\b', re.IGNORECASE)
     
-    df = df[(df['toxicity'] >= 0.5) == toxic].reset_index()
-    df = df[np.where(df['comment_text'].str.split().str.len()<=10, True, False)].reset_index()
-    df = df[np.where(df['comment_text'].str.contains(identity_regex), True, False)].reset_index()
+    df = df[(df['toxicity'] >= 0.5) == toxic]
+    df = df[np.where(df['comment_text'].str.split().str.len()<=10, True, False)]
+    df = df[np.where(df['comment_text'].str.contains(identity_regex), True, False)]
 
     # the "columns" in our modified data set
     sentences = []
