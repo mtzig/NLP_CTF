@@ -42,6 +42,7 @@ print('loading word embeddings')
 embed_lookup = init_embed_lookup(word2vec=args.glove)
 pretrained_embed = torch.from_numpy(embed_lookup.vectors)
 print('done')
+
 print('loading datasets')
 # get datasets
 if args.train_method == 'CLP':
@@ -87,7 +88,7 @@ for trial in range(int(args.trials)):
     torch.cuda.empty_cache()
     
     # initialize models    
-    model = CNNClassifier(pretrained_embed,device=DEVICE, num_feature_maps=args.featuremaps, kernel_sizes=args.kernelsizes)
+    model = CNNClassifier(pretrained_embed,device=DEVICE, num_feature_maps=int(args.featuremaps), kernel_sizes=args.kernelsizes)
     if args.train_method == 'CLP':
         loss_fn = CLP_loss(torch.nn.CrossEntropyLoss(), A, lmbda=float(args.lambda_clp), only_nontox=args.nontoxic)
     else:
