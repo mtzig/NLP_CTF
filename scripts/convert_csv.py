@@ -48,7 +48,7 @@ def generate_civil_data(toxic, path, identity_list):
 
 
 
-    identity_regex = re.compile('|'.join(identity_list), re.IGNORECASE)
+    identity_regex = re.compile(r'\b' + '|'.join(identity_list) + '[ing|s|es|.|,|!|?|;]*' + r'\b', re.IGNORECASE)
     
     df = df[(df['toxicity'] >= 0.5) == toxic]
     df = df[np.where(df['comment_text'].str.split().str.len()<=10, True, False)]
@@ -79,14 +79,14 @@ def generate_civil_data(toxic, path, identity_list):
     
 def generate_synthetic_data(toxic, path, identity_list):
     '''
-        input: 
-            boolean toxic (true if we want toxic data)
-            path to data set
-            identity list we want to use (test or train)
-        output: returns modified dataframe
-        
-        This is specific to synthetic data sets (very small difference with 
-        original datasets labels and toxicity measurements).
+    input: 
+        boolean toxic (true if we want toxic data)
+        path to data set
+        identity list we want to use (test or train)
+    output: returns modified dataframe
+    
+    This is specific to synthetic data sets (very small difference with 
+    original datasets labels and toxicity measurements).
     '''
     df = pd.read_csv(path)
 
