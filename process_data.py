@@ -6,7 +6,6 @@ from torch.utils.data import TensorDataset
 from tqdm import tqdm
 import re
 import numpy as np
-import random
 
 
 idents = list(pd.read_csv('./data/random_split_data/train_identities.txt', header=None).iloc[:,0].astype('string'))
@@ -131,8 +130,6 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
         df_train = process_blind(df_train)
     elif data_type == 'augment':
         df_train = process_augment(df_train)
-    elif data_type == 'augment1':
-        df_train == process_augment(df_train, single=True)
     elif data_type == 'CLP': # CLP
         df_train, df_adversarial = process_clp(df_train)
    
@@ -249,7 +246,7 @@ def process_blind(df):
     return df
 
 
-def process_augment(df, single = False):
+def process_augment(df):
 
     # Adding identity column to train_df_short (either works I think)
     df['identity'] = (df[idents].sum(axis=1) > 0).astype(int)
@@ -264,16 +261,11 @@ def process_augment(df, single = False):
             if df_identities.at[row_index, identity] == 1:
                 comment_list.append(df_identities.at[row_index, "comment_text"])
                 toxic_list.append(df_identities.at[row_index, "toxic"])
-                if single:
-                    diff_identity = random.choice([ident for ident in idents if ident != identity])
+                for diff_identity in idents:
+                    if diff_identity == identity:
+                        continue
                     comment_list.append(re.sub(regex, diff_identity, df_identities.at[row_index, "comment_text"], flags=re.IGNORECASE))
                     toxic_list.append(df_identities.at[row_index, "toxic"])
-                else:
-                    for diff_identity in idents:
-                        if diff_identity == identity:
-                            continue
-                        comment_list.append(re.sub(regex, diff_identity, df_identities.at[row_index, "comment_text"], flags=re.IGNORECASE))
-                        toxic_list.append(df_identities.at[row_index, "toxic"])
      
     data_tuples = list(zip(comment_list, toxic_list))
     train_df_augment = pd.DataFrame(data_tuples, columns=['comment_text','toxic'])
