@@ -191,6 +191,10 @@ def get_ctf_datasets(file_path='./data', dataset='civil_eval', device='cpu', emb
     
     elif dataset == 'synth_nontoxic':
         df = pd.read_csv(f'{file_path}/synthetic/synthetic_nontoxic_df.csv', index_col=0)
+    elif dataset == 'synth_nontoxic_2':
+        df = pd.read_csv(f'{file_path}/synthetic/synthetic_nontoxic_df_2.csv', index_col=0)
+    elif dataset == 'synth_toxic_2':
+        df = pd.read_csv(f'{file_path}/synthetic/synthetic_toxic_df_2.csv', index_col=0)
     else:
         df = pd.read_csv(f'{file_path}/synthetic/synthetic_toxic_df.csv', index_col=0)
 
