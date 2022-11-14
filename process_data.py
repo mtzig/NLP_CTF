@@ -132,7 +132,7 @@ def get_jigsaw_datasets(file_path='./data', device='cpu', data_type='baseline', 
     elif data_type == 'augment':
         df_train = process_augment(df_train)
     elif data_type == 'augment1':
-        df_train == process_augment(df_train, single=True)
+        df_train = process_augment(df_train, single=True)
     elif data_type == 'CLP': # CLP
         df_train, df_adversarial = process_clp(df_train)
    
