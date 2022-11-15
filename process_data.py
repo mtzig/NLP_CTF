@@ -56,19 +56,18 @@ def get_Synthetic_Datasets(device='cpu', embed_lookup=None, synth_df_name="89"):
     CC_df['toxicity'] = (CC_df['Label'] == "BAD").astype(int)
 
     print("THIS IS THE DF: ", CC_df.head())
-
-    sub_df = CC_df
-
+    print("ACCESS FIRST COLUMN: ", CC_df.iloc[:, 0])
+    print("ACCESS TEXT COLUMN: ", CC_df['Text'])
 
     padded_id = []
-    for comment in tqdm(sub_df['Text'].values):
+    for comment in tqdm(CC_df['Text'].values):
         seq = tokenize(comment)
         id = get_id(seq, embed_lookup)
         padded_id.append(pad_seq(id))
     
     features = torch.tensor(padded_id, device=device)
 
-    labels = torch.from_numpy(sub_df['toxicity'].values).to(device)
+    labels = torch.from_numpy(CC_df['toxicity'].values).to(device)
     labels = labels.to(device).long()
     
     return TensorDataset(features, labels)
