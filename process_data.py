@@ -39,19 +39,24 @@ def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
     
     return TensorDataset(features, labels)
 
-def get_Synthetic_Datasets(device='cpu', embed_lookup=None):
+def get_Synthetic_Datasets(device='cpu', embed_lookup=None, synth_df_name = "89"):
     '''
     gets the test split of civil comments dataset
     '''
 
     if not embed_lookup:
         embed_lookup = init_embed_lookup()
+        
+    if synth_df_name == "89":
+        df_path = './data/bias_madlibs_89k.csv'
+    else:
+        df_path = './data/bias_madlibs_77k.csv'
 
-    CC_df = pd.read_csv('./data/bias_madlibs_77k.csv', index_col=0)
+    CC_df = pd.read_csv(df_path, index_col=0)
     CC_df['toxicity'] = (CC_df['Label'] == "BAD").astype(int)
 
 
-    sub_df = CC_df[CC_df['split'] == 'test']
+    sub_df = CC_df
 
 
     padded_id = []

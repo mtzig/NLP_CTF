@@ -48,8 +48,8 @@ jig_dev_data = get_jigsaw_dev_data(device=DEVICE, embed_lookup=embed_lookup)
 cc_data = get_CivilComments_Datasets(device=DEVICE, embed_lookup=embed_lookup)
 cc_idents_data = get_CivilComments_idents_Datasets(device=DEVICE, embed_lookup=embed_lookup)
 
-synth_data = get_Synthetic_Datasets(device=DEVICE, embed_lookup=embed_lookup)
-synth_idents_data = get_Synthetic_idents_Datasets(device=DEVICE, embed_lookup=embed_lookup)
+synth_data_89 = get_Synthetic_Datasets(device=DEVICE, embed_lookup=embed_lookup, "89")
+synth_data_77 = get_Synthetic_Datasets(device=DEVICE, embed_lookup=embed_lookup, "77")
 
 # initialize every ctf datasets
 ctf_datas = []
@@ -63,8 +63,8 @@ jig_loader = DataLoader(jig_dev_data, batch_size=64)
 cc_loader = DataLoader(cc_data, batch_size=64)
 cc_idents_loader = DataLoader(cc_idents_data, batch_size=64)
 
-synth_loader = DataLoader(synth_data, batch_size=64)
-synth_idents_loader = DataLoader(synth_idents_data, batch_size=64)
+synth_loader_89 = DataLoader(synth_data_89, batch_size=64)
+synth_loader_77 = DataLoader(synth_data_77, batch_size=64)
 
 ctf_loaders = []
 for data in ctf_datas:
@@ -103,18 +103,19 @@ for trial in range(int(args.trials)):
 
     # evaluate loss/accuracy/sensitivity/specificity/AUC on civil comments test set
     cc_results = evaluate(cc_loader, model, get_loss=True, verbose=args.verbose)
-    synth_results = evaluate(synth_loader, model, get_loss=True, verbose=args.verbose)
+    synth_results_89 = evaluate(synth_loader_89, model, get_loss=True, verbose=args.verbose)
+    synth_results_77 = evaluate(synth_loader_77, model, get_loss=True, verbose=args.verbose)
+
 
     # evaluate loss/accuracy/sensitivity/specificity/AUC on civil comments idents only test set
     cc_idents_results = evaluate(cc_idents_loader, model, get_loss=True, verbose=args.verbose)
-    synth_idents_results = evaluate(synth_idents_loader, model, get_loss=True, verbose=args.verbose)
 
     # evaluate CTF gap over every eval dataset
     ctf_gaps = []
     for ctf_loader in ctf_loaders:
         ctf_gaps.append(CTF(ctf_loader, model, verbose=args.verbose))
 
-    results.append(jig_results+cc_results+cc_idents_results+synth_results+synth_idents_results+tuple(ctf_gaps))
+    results.append(jig_results+cc_results+cc_idents_results+synth_results_89+synth_results_77+tuple(ctf_gaps))
 
 
 # output results as csv
@@ -123,8 +124,8 @@ columns = ('jig_loss', 'jig_accuracy', 'jig_tp', 'jig_tn', 'jig_auc',
             'cci_loss', 'cci_accuracy', 'cci_tp', 'cci_tn', 'cci_auc',
             'ctf_cc_eval', 'ctf_cc_train',
             'ctf_synth_toxic', 'ctf_synth_nontoxic', 'ctf_synth_toxic_2', 'ctf_synth_nontoxic_2',
-           'synth_accuracy', 'synth_tp', 'synth_tn', 'synth_auc',
-           'synthi_accuracy', 'synthi_tp', 'synthi_tn', 'synthi_auc',
+           'synth_89_loss', 'synth_89_accuracy', 'synth_89_tp', 'synth_89_tn', 'synth_89_auc',
+           'synth_77_loss', 'synth_77_accuracy', 'synth_77_tp', 'synth_77_tn', 'synth_77_auc',
             )
 
 print('outputting results to csv')
