@@ -60,7 +60,7 @@ def get_Synthetic_Datasets(device='cpu', embed_lookup=None, synth_df_name="89"):
     print("ACCESS TEXT COLUMN: ", CC_df['Text'])
 
     padded_id = []
-    for comment in tqdm(CC_df['Text'].values):
+    for comment in tqdm(CC_df.iloc[:, 0].values):
         seq = tokenize(comment)
         id = get_id(seq, embed_lookup)
         padded_id.append(pad_seq(id))
