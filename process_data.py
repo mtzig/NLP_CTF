@@ -39,7 +39,7 @@ def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
     
     return TensorDataset(features, labels)
 
-def get_Synthetic_Datasets(device='cpu', embed_lookup=None, synth_df_name = "89"):
+def get_Synthetic_Datasets(device='cpu', embed_lookup=None, synth_df_name="89"):
     '''
     gets the test split of civil comments dataset
     '''
