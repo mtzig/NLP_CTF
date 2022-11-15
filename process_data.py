@@ -39,6 +39,34 @@ def get_CivilComments_Datasets(device='cpu', embed_lookup=None):
     
     return TensorDataset(features, labels)
 
+def get_Synthetic_Datasets(device='cpu', embed_lookup=None):
+    '''
+    gets the test split of civil comments dataset
+    '''
+
+    if not embed_lookup:
+        embed_lookup = init_embed_lookup()
+
+    CC_df = pd.read_csv('./data/bias_madlibs_77k.csv', index_col=0)
+    CC_df['toxicity'] = (CC_df['Label'] == "BAD").astype(int)
+
+
+    sub_df = CC_df[CC_df['split'] == 'test']
+
+
+    padded_id = []
+    for comment in tqdm(sub_df['Text'].values):
+        seq = tokenize(comment)
+        id = get_id(seq, embed_lookup)
+        padded_id.append(pad_seq(id))
+    
+    features = torch.tensor(padded_id, device=device)
+
+    labels = torch.from_numpy(sub_df['toxicity'].values).to(device)
+    labels = labels.to(device).long()
+    
+    return TensorDataset(features, labels)
+
 def get_CivilComments_idents_Datasets(device='cpu', embed_lookup=None):
     '''
         returns subset of CivilComments dataset only with identity
@@ -64,6 +92,35 @@ def get_CivilComments_idents_Datasets(device='cpu', embed_lookup=None):
     features = torch.tensor(padded_id, device=device)
 
     labels = torch.from_numpy(df_idents['toxicity'].values).to(device)
+    labels = labels.to(device).long()
+    
+    return TensorDataset(features, labels)
+
+def get_Synthetic_idents_Datasets(device='cpu', embed_lookup=None):
+    '''
+        returns subset of CivilComments dataset only with identity
+    '''
+
+    if not embed_lookup:
+        embed_lookup = init_embed_lookup()
+
+    df_nontoxic = pd.read_csv(f'./data/synthetic/synthetic_nontoxic_df_2.csv', index_col=0)
+    df_toxic = pd.read_csv(f'./data/synthetic/synthetic_toxic_df_2.csv', index_col=0)
+
+    df_nontoxic['Label'] = 0
+    df_toxic['Label'] = 1
+
+    df_idents = pd.concat([df_nontoxic[['Text', 'Label']], df_toxic[['Text', 'Label']]])
+
+    padded_id = []
+    for comment in tqdm(df_idents['Text'].values):
+        seq = tokenize(comment)
+        id = get_id(seq, embed_lookup)
+        padded_id.append(pad_seq(id))
+    
+    features = torch.tensor(padded_id, device=device)
+
+    labels = torch.from_numpy(df_idents['Label'].values).to(device)
     labels = labels.to(device).long()
     
     return TensorDataset(features, labels)
