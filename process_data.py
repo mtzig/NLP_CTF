@@ -55,6 +55,7 @@ def get_Synthetic_Datasets(device='cpu', embed_lookup=None, synth_df_name="89"):
     CC_df = pd.read_csv(df_path, index_col=0)
     CC_df['toxicity'] = (CC_df['Label'] == "BAD").astype(int)
 
+    print("THIS IS THE DF: ", CC_df.head())
 
     sub_df = CC_df
 
