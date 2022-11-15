@@ -28,7 +28,7 @@ class CLP_loss:
 
         # only does clp on nontoxic comments
         if self.only_nontox:
-            ident_comments = torch.logical_and(ident_comments, (y==1))
+            ident_comments = torch.logical_and(ident_comments, (y==0))
 
         num_ident_comments = sum(ident_comments)
 
