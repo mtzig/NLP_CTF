@@ -51,8 +51,6 @@ cc_idents_data = get_CivilComments_idents_Datasets(device=DEVICE, embed_lookup=e
 synth_data_89 = get_Synthetic_Datasets(device=DEVICE, embed_lookup=embed_lookup, synth_df_name="89")
 synth_data_77 = get_Synthetic_Datasets(device=DEVICE, embed_lookup=embed_lookup, synth_df_name="77")
 
-print(synth_data_89)
-
 # initialize every ctf datasets
 ctf_datas = []
 for dataset in ('civil_eval', 'civil_train', 'synth_toxic', 'synth_nontoxic', 'synth_toxic_2', 'synth_nontoxic_2'):
@@ -127,7 +125,7 @@ columns = ('jig_loss', 'jig_accuracy', 'jig_tp', 'jig_tn', 'jig_auc',
             'synth_89_loss', 'synth_89_accuracy', 'synth_89_tp', 'synth_89_tn', 'synth_89_auc',
             'synth_77_loss', 'synth_77_accuracy', 'synth_77_tp', 'synth_77_tn', 'synth_77_auc',
             'ctf_cc_eval', 'ctf_cc_train',
-            'ctf_synth_toxic', 'ctf_synth_nontoxic', 'ctf_synth_toxic_2', 'ctf_synth_nontoxic_2',
+            'ctf_synth_77_toxic', 'ctf_synth_77_nontoxic', 'ctf_synth_89_toxic_2', 'ctf_synth_89_nontoxic_2',
             )
 
 print('outputting results to csv')
