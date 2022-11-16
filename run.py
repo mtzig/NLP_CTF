@@ -51,7 +51,7 @@ cc_idents_data = get_CivilComments_idents_Datasets(device=DEVICE, embed_lookup=e
 synth_data_89 = get_Synthetic_Datasets(device=DEVICE, embed_lookup=embed_lookup, synth_df_name="89")
 synth_data_77 = get_Synthetic_Datasets(device=DEVICE, embed_lookup=embed_lookup, synth_df_name="77")
 
-print(synth_data_89.head())
+print(synth_data_89)
 
 # initialize every ctf datasets
 ctf_datas = []
