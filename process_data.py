@@ -52,11 +52,11 @@ def get_Synthetic_Datasets(device='cpu', embed_lookup=None, synth_df_name="89"):
     else:
         df_path = './data/bias_madlibs_77k.csv'
 
-    CC_df = pd.read_csv(df_path, index_col=0)
+    CC_df = pd.read_csv(df_path)
     CC_df['toxicity'] = (CC_df['Label'] == "BAD").astype(int)
 
     padded_id = []
-    for comment in tqdm(CC_df.iloc[:, 0].values):
+    for comment in tqdm(CC_df['Text'].values):
         seq = tokenize(comment)
         id = get_id(seq, embed_lookup)
         padded_id.append(pad_seq(id))
