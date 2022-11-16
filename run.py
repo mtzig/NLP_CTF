@@ -124,10 +124,10 @@ for trial in range(int(args.trials)):
 columns = ('jig_loss', 'jig_accuracy', 'jig_tp', 'jig_tn', 'jig_auc',
             'cc_loss', 'cc_accuracy', 'cc_tp', 'cc_tn', 'cc_auc',
             'cci_loss', 'cci_accuracy', 'cci_tp', 'cci_tn', 'cci_auc',
+            'synth_89_loss', 'synth_89_accuracy', 'synth_89_tp', 'synth_89_tn', 'synth_89_auc',
+            'synth_77_loss', 'synth_77_accuracy', 'synth_77_tp', 'synth_77_tn', 'synth_77_auc',
             'ctf_cc_eval', 'ctf_cc_train',
             'ctf_synth_toxic', 'ctf_synth_nontoxic', 'ctf_synth_toxic_2', 'ctf_synth_nontoxic_2',
-           'synth_89_loss', 'synth_89_accuracy', 'synth_89_tp', 'synth_89_tn', 'synth_89_auc',
-           'synth_77_loss', 'synth_77_accuracy', 'synth_77_tp', 'synth_77_tn', 'synth_77_auc',
             )
 
 print('outputting results to csv')
