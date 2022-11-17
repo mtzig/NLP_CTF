@@ -18,7 +18,7 @@ parser.add_argument('--trials', '-t', default=10, help='The number of trials to 
 parser.add_argument('--epochs', '-e', default=5, help='The number of epochs to train model, defaults to 5')
 parser.add_argument('--test_name', '-n', default='test', help='The name of the test to run (defaults to "test"), the output files will be saved in the directory ./[name].csv')
 parser.add_argument('--glove', '-g', action='store_false', help='uses glove instead of word2vec')
-parser.add_argument('--featuremaps', '-f', default=100, help='number of feature maps for model to use, defaults to 100')
+parser.add_argument('--featuremaps', '-f', default=300, help='number of feature maps for model to use, defaults to 300')
 parser.add_argument('--kernelsizes', '-k', default=(2,3,4,5), nargs="+", type=int, help='kernel sizes to use to intialize model defaults to (2,3,4,5)')
 parser.add_argument('--device', '-d', default='cuda' if torch.cuda.is_available() 
                                                      else 'mps' if torch.backends.mps.is_available() and torch.backends.mps.is_built() 
